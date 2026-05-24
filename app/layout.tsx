@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import "./globals.css";
+import Header from "@/components/Header";
 
 export const metadata: Metadata = {
-  title: "Group 6 - TCSS 460",
-  description: "Client-Server group project frontend",
+  title: "MovieBrowse",
+  description: "Sprint 6 Consumer App",
 };
 
 export default function RootLayout({
@@ -13,7 +13,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body style={{ margin: 0, fontFamily: "system-ui, sans-serif" }}>
+        <Header />
+        <main style={{ padding: "24px" }}>{children}</main>
+      </body>
     </html>
   );
 }

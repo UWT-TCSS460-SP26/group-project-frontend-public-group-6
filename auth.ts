@@ -1,32 +1,38 @@
 import NextAuth from "next-auth";
+import type { NextAuthConfig } from "next-auth";
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
+const config: NextAuthConfig = {
   providers: [
     {
       id: "tcss460",
       name: "TCSS 460",
       type: "oidc",
-      issuer: "https://tcss-460-iam.onrender.com",
-      clientId: process.env.AUTH_CLIENT_ID,
-      clientSecret: process.env.AUTH_CLIENT_SECRET,
+      issuer: process.env.AUTH_TCSS460_ISSUER,
+      clientId: process.env.AUTH_TCSS460_CLIENT_ID,
+      clientSecret: process.env.AUTH_TCSS460_CLIENT_SECRET,
       authorization: {
         params: {
           audience: process.env.AUTH_TCSS460_AUDIENCE,
+          scope: "openid profile email",
         },
       },
     },
   ],
   callbacks: {
     async jwt({ token, account }) {
+      // On first sign-in, account is populated — save the tokens
       if (account) {
-        token.access_token = account.access_token;
-        token.id_token = account.id_token;
+        token.accessToken = account.access_token;
+        token.idToken = account.id_token;
       }
       return token;
     },
     async session({ session, token }) {
-      (session as any).access_token = token.access_token;
+      // Expose the access token to the client session
+      session.accessToken = token.accessToken as string;
       return session;
     },
   },
-});
+};
+
+export const { handlers, auth, signIn, signOut } = NextAuth(config);

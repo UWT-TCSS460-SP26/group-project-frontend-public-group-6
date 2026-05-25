@@ -40,10 +40,7 @@ export default async function SearchPage({
         <SearchForm defaultQuery={query} />
 
         {query && (
-          <p
-            className="subtitle-text"
-            style={{ marginTop: "16px", marginBottom: "8px" }}
-          >
+          <p className="subtitle-text results-meta">
             {total} result{total !== 1 ? "s" : ""} for &ldquo;{query}&rdquo;
           </p>
         )}
@@ -88,7 +85,7 @@ export default async function SearchPage({
           </p>
         )}
         {!query && (
-          <p className="subtitle-text" style={{ marginTop: "24px" }}>
+          <p className="subtitle-text page-section">
             Enter a title above to search movies and TV shows.
           </p>
         )}

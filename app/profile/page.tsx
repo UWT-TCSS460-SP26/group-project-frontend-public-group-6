@@ -23,7 +23,7 @@ export default async function ProfilePage() {
           </p>
         </section>
 
-        <section className="page-section detail-panel">
+        <section className="page-section profile-section">
           <h2>Access token</h2>
           <p className="subtitle-text">
             Copy this and paste it into{" "}
@@ -32,10 +32,7 @@ export default async function ProfilePage() {
             </a>{" "}
             to verify <code>iss</code> and <code>aud</code> are correct.
           </p>
-          <ul
-            className="subtitle-text"
-            style={{ marginTop: "8px", paddingLeft: "18px" }}
-          >
+          <ul className="profile-list">
             <li>
               <code>iss</code> should be{" "}
               <code>https://tcss-460-iam.onrender.com</code>
@@ -48,7 +45,6 @@ export default async function ProfilePage() {
             readOnly
             defaultValue={session.accessToken ?? "(no token)"}
             className="textarea"
-            style={{ marginTop: "16px" }}
           />
         </section>
       </div>

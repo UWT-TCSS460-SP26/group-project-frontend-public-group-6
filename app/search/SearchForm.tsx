@@ -13,7 +13,6 @@ export default function SearchForm({ defaultQuery }: { defaultQuery: string }) {
         if (q.trim()) router.push(`/search?q=${encodeURIComponent(q.trim())}`);
       }}
       className="search-form"
-      style={{ display: "flex", gap: "12px", maxWidth: "560px" }}
     >
       <input
         type="text"
@@ -21,7 +20,6 @@ export default function SearchForm({ defaultQuery }: { defaultQuery: string }) {
         onChange={(e) => setQ(e.target.value)}
         placeholder="Search movies & TV shows…"
         className="input"
-        style={{ flex: 1 }}
       />
       <button type="submit" className="btn btn-primary">
         Search

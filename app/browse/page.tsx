@@ -101,7 +101,7 @@ export default async function BrowsePage({
 
         {showMovies && (
           <section className="page-section">
-            <h2 className="section-heading">Movies:</h2>
+            <h2 className="section-heading">Movies</h2>
             {movies.length === 0 ? (
               <p className="subtitle-text">
                 {moviesApiFailed
@@ -128,7 +128,7 @@ export default async function BrowsePage({
 
         {showTv && (
           <section className="page-section">
-            <h2 className="section-heading">TV Shows:</h2>
+            <h2 className="section-heading">TV Shows</h2>
             {tvShows.length === 0 ? (
               <p className="subtitle-text">
                 {tvApiFailed

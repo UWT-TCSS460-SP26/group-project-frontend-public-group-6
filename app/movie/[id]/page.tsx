@@ -41,39 +41,18 @@ export default async function MovieDetailPage({
           )}
 
           <div>
-            <h1 style={{ marginTop: 0 }}>{movie.title}</h1>
-            {movie.tagline && (
-              <p
-                style={{ fontStyle: "italic", color: "#6b7280", marginTop: 0 }}
-              >
-                {movie.tagline}
-              </p>
-            )}
+            <h1 className="detail-title">{movie.title}</h1>
+            {movie.tagline && <p className="tagline">{movie.tagline}</p>}
             {movie.genres && movie.genres.length > 0 && (
-              <div
-                style={{
-                  display: "flex",
-                  gap: "8px",
-                  flexWrap: "wrap",
-                  marginBottom: "12px",
-                }}
-              >
+              <div className="genre-list">
                 {movie.genres.map((g) => (
-                  <span
-                    key={g.id}
-                    style={{
-                      background: "#e5e7eb",
-                      borderRadius: "9999px",
-                      padding: "3px 10px",
-                      fontSize: "0.8rem",
-                    }}
-                  >
+                  <span key={g.id} className="genre-tag">
                     {g.name}
                   </span>
                 ))}
               </div>
             )}
-            <p style={{ lineHeight: 1.75 }}>{movie.overview}</p>
+            <p className="body-text">{movie.overview}</p>
             <dl className="meta-list">
               {movie.release_date && (
                 <>
@@ -94,14 +73,7 @@ export default async function MovieDetailPage({
                 </>
               )}
             </dl>
-            <p
-              style={{
-                marginTop: "24px",
-                color: "#9ca3af",
-                fontSize: "0.95rem",
-                fontStyle: "italic",
-              }}
-            >
+            <p className="sprint-note">
               Sign in to rate this title — coming in Sprint 7.
             </p>
           </div>

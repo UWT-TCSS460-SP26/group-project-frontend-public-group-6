@@ -18,6 +18,10 @@ function getSystemTheme(): Theme {
     : "light";
 }
 
+function applyTheme(theme: Theme) {
+  document.documentElement.classList.toggle("dark", theme === "dark");
+}
+
 export default function ThemeToggle() {
   const [theme, setTheme] = useState<Theme>("light");
 
@@ -26,27 +30,34 @@ export default function ThemeToggle() {
     const effectiveTheme = stored ?? getSystemTheme();
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setTheme(effectiveTheme);
-    document.documentElement.classList.toggle(
-      "dark",
-      effectiveTheme === "dark",
-    );
+    applyTheme(effectiveTheme);
   }, []);
 
   const toggleTheme = () => {
     const nextTheme: Theme = theme === "dark" ? "light" : "dark";
     setTheme(nextTheme);
     window.localStorage.setItem(STORAGE_KEY, nextTheme);
-    document.documentElement.classList.toggle("dark", nextTheme === "dark");
+    applyTheme(nextTheme);
   };
 
   return (
     <button
       type="button"
       onClick={toggleTheme}
-      className="btn btn-ghost"
-      aria-label="Toggle dark mode"
+      className="theme-toggle"
+      aria-label={
+        theme === "dark"
+          ? "Dark mode on, switch to light"
+          : "Light mode on, switch to dark"
+      }
+      title={theme === "dark" ? "Dark mode" : "Light mode"}
     >
-      {theme === "dark" ? "☀️ Light" : "🌙 Dark"}
+      <span className="theme-toggle__icon" aria-hidden>
+        {theme === "dark" ? "🌙" : "☀️"}
+      </span>
+      <span className="theme-toggle__label">
+        {theme === "dark" ? "Dark" : "Light"}
+      </span>
     </button>
   );
 }

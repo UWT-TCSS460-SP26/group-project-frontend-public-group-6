@@ -151,7 +151,7 @@ export default function BrowseFilters({ mediaType, params }: Props) {
           />
         </label>
 
-        <div className="filter-actions" style={{ gridColumn: "1 / -1" }}>
+        <div className="filter-actions">
           <button type="submit" className="btn btn-primary">
             Apply filters
           </button>

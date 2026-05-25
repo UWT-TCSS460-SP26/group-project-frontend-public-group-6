@@ -1,4 +1,4 @@
-# Group 6 2026-05-24 Sprint 6 Meeting 2 (4:30 - 5:50)
+# Group 6 2026-05-24 Sprint 6 Meeting 1 (4:30 - 5:50)
 
 **Modality: Discord**
 

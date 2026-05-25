@@ -1,0 +1,2276 @@
+openapi: 3.0.3
+info:
+  title: TCSS 460 Group 5 API
+  description: |
+    **Team:** Group 5
+    **Deployed URL:** https://tcss460-group-5-api.onrender.com
+    A RESTful API for the TCSS 460 group project.
+  version: 0.1.0
+servers:
+  - url: https://tcss460-group-5-api.onrender.com
+    description: Production
+  - url: http://localhost:3000
+    description: Local development
+tags:
+  - name: System
+    description: Health and status routes
+  - name: Movies
+    description: Movie search, discovery, and details.
+  - name: TV
+    description: TV show search, discovery, and details.
+  - name: Ratings
+    description: User ratings for movies and TV shows.
+  - name: Reviews
+    description: User reviews for movies and TV shows.
+  - name: Issues
+    description: Bug report submission (public) and issue management (Admin+).
+  - name: Discovery
+    description: Community-ranked discovery feeds. Public — no auth required.
+paths:
+  /health:
+    get:
+      tags:
+        - System
+      summary: Health check
+      description: Returns 200 OK when the API is alive. No auth required.
+      responses:
+        "200":
+          description: API is running
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  uptime:
+                    type: number
+                    example: 3847.2
+                  timestamp:
+                    type: string
+                    format: date-time
+  /v1/movies:
+    get:
+      tags:
+        - Movies
+      summary: Search or discover movies
+      description: >
+        Returns a list of movies. If a `query` parameter is provided, performs a
+        text search via TMDB's search endpoint. Otherwise, uses TMDB's discover
+        endpoint with the provided filter parameters.
+      parameters:
+        - name: q
+          in: query
+          description: Text search query (e.g. "spiderman"). When provided, all filter
+            parameters are ignored.
+          required: false
+          schema:
+            type: string
+          example: spiderman
+        - name: limit
+          in: query
+          description: Maximum number of results to return. Must be a positive integer no
+            greater than 50.
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+          example: 20
+        - name: language
+          in: query
+          description: Language of results in BCP 47 format.
+          required: false
+          schema:
+            type: string
+          example: en-US
+        - name: primary_release_date_gte
+          in: query
+          description: Filter movies released on or after this date (YYYY-MM-DD). Only
+            applies when `query` is not provided.
+          required: false
+          schema:
+            type: string
+            format: date
+          example: 2020-01-01
+        - name: primary_release_date_lte
+          in: query
+          description: Filter movies released on or before this date (YYYY-MM-DD). Only
+            applies when `query` is not provided.
+          required: false
+          schema:
+            type: string
+            format: date
+          example: 2024-12-31
+        - name: with_genres
+          in: query
+          description: Comma-separated list of TMDB genre IDs to filter by. Only applies
+            when `query` is not provided.
+          required: false
+          schema:
+            type: string
+          example: 28,878
+        - name: with_runtime_gte
+          in: query
+          description: Filter by minimum runtime in minutes. Only applies when `query` is
+            not provided.
+          required: false
+          schema:
+            type: integer
+          example: 90
+        - name: with_runtime_lte
+          in: query
+          description: Filter by maximum runtime in minutes. Only applies when `query` is
+            not provided.
+          required: false
+          schema:
+            type: integer
+          example: 180
+      responses:
+        "200":
+          description: A list of movies matching the search or filter criteria.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MovieSummary"
+              example:
+                - id: 557
+                  title: Spider-Man
+                  backdrop_path: /zQ8AxTPiCiS5nnwXpwTBPBHSaa5.jpg
+                  poster_path: /kjdJntyBeEvqm9w97QGBdxPptzj.jpg
+        "400":
+          description: Invalid query parameters.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                invalidLimit:
+                  summary: Invalid limit value
+                  value:
+                    error: limit must be a positive integer
+                limitTooHigh:
+                  summary: Limit exceeds maximum
+                  value:
+                    error: limit must not exceed 50
+        "500":
+          description: Internal server error or TMDB API failure.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /v1/movies/popular:
+    get:
+      tags:
+        - Movies
+      summary: Get popular movies
+      description: Returns a list of currently popular movies from TMDB.
+      parameters:
+        - name: limit
+          in: query
+          description: Maximum number of results to return. Must be a positive integer no
+            greater than 50.
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+          example: 20
+        - name: language
+          in: query
+          description: Language of results in BCP 47 format.
+          required: false
+          schema:
+            type: string
+          example: en-US
+      responses:
+        "200":
+          description: A list of popular movies.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MovieSummary"
+              example:
+                - id: 557
+                  title: Spider-Man
+                  backdrop_path: /zQ8AxTPiCiS5nnwXpwTBPBHSaa5.jpg
+                  poster_path: /kjdJntyBeEvqm9w97QGBdxPptzj.jpg
+        "400":
+          description: Invalid query parameters.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                invalidLimit:
+                  summary: Invalid limit value
+                  value:
+                    error: limit must be a positive integer
+                limitTooHigh:
+                  summary: Limit exceeds maximum
+                  value:
+                    error: limit must not exceed 50
+        "500":
+          description: Internal server error or TMDB API failure.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /v1/movies/{id}:
+    get:
+      tags:
+        - Movies
+      summary: Get a movie by ID
+      description: Returns detailed information for a specific movie by its TMDB movie ID.
+      parameters:
+        - name: id
+          in: path
+          description: The TMDB movie ID.
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          example: 11
+      responses:
+        "200":
+          description: Detailed information about the requested movie.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MovieDetail"
+        "400":
+          description: Invalid movie ID.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: Movie id must be a positive integer
+        "404":
+          description: Movie not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: Movie with id 99999 not found
+        "500":
+          description: Internal server error or TMDB API failure.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /v1/tv:
+    get:
+      tags:
+        - TV
+      summary: Search or discover TV shows
+      description: >
+        Returns a list of TV shows. If a `q` parameter is provided, performs a
+        text search via TMDB's search endpoint. Otherwise, uses TMDB's discover
+        endpoint with the provided filter parameters.
+      parameters:
+        - name: q
+          in: query
+          description: Text search query (e.g. "breaking bad"). When provided, all filter
+            parameters are ignored.
+          required: false
+          schema:
+            type: string
+          example: breaking bad
+        - name: limit
+          in: query
+          description: Maximum number of results to return. Must be a positive integer no
+            greater than 50.
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+          example: 20
+        - name: language
+          in: query
+          description: Language of results in BCP 47 format.
+          required: false
+          schema:
+            type: string
+          example: en-US
+        - name: first_air_date_gte
+          in: query
+          description: Filter shows that first aired on or after this date (YYYY-MM-DD).
+            Only applies when `q` is not provided.
+          required: false
+          schema:
+            type: string
+            format: date
+          example: 2020-01-01
+        - name: first_air_date_lte
+          in: query
+          description: Filter shows that first aired on or before this date (YYYY-MM-DD).
+            Only applies when `q` is not provided.
+          required: false
+          schema:
+            type: string
+            format: date
+          example: 2024-12-31
+        - name: with_genres
+          in: query
+          description: Comma-separated list of TMDB genre IDs to filter by. Only applies
+            when `q` is not provided.
+          required: false
+          schema:
+            type: string
+          example: 18,10765
+        - name: with_runtime_gte
+          in: query
+          description: Filter by minimum episode runtime in minutes. Only applies when `q`
+            is not provided.
+          required: false
+          schema:
+            type: integer
+          example: 20
+        - name: with_runtime_lte
+          in: query
+          description: Filter by maximum episode runtime in minutes. Only applies when `q`
+            is not provided.
+          required: false
+          schema:
+            type: integer
+          example: 60
+      responses:
+        "200":
+          description: A list of TV shows matching the search or filter criteria.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TvSummary"
+        "400":
+          description: Invalid query parameters.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                invalidLimit:
+                  summary: Invalid limit value
+                  value:
+                    error: limit must be a positive integer
+                limitTooHigh:
+                  summary: Limit exceeds maximum
+                  value:
+                    error: limit must not exceed 50
+        "500":
+          description: Internal server error or TMDB API failure.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /v1/tv/popular:
+    get:
+      tags:
+        - TV
+      summary: Get popular TV shows
+      description: Returns a list of currently popular TV shows from TMDB.
+      parameters:
+        - name: limit
+          in: query
+          description: Maximum number of results to return. Must be a positive integer no
+            greater than 50.
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+          example: 20
+        - name: language
+          in: query
+          description: Language of results in BCP 47 format.
+          required: false
+          schema:
+            type: string
+          example: en-US
+      responses:
+        "200":
+          description: A list of popular TV shows.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TvSummary"
+        "400":
+          description: Invalid query parameters.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                invalidLimit:
+                  summary: Invalid limit value
+                  value:
+                    error: limit must be a positive integer
+                limitTooHigh:
+                  summary: Limit exceeds maximum
+                  value:
+                    error: limit must not exceed 50
+        "500":
+          description: Internal server error or TMDB API failure.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /v1/tv/{id}:
+    get:
+      tags:
+        - TV
+      summary: Get a TV show by ID
+      description: Returns detailed information for a specific TV show by its TMDB ID.
+      parameters:
+        - name: id
+          in: path
+          description: The TMDB TV show ID.
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          example: 1396
+      responses:
+        "200":
+          description: Detailed information about the requested TV show.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TvDetail"
+        "400":
+          description: Invalid TV show ID.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: TV show id must be a positive integer
+        "404":
+          description: TV show not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: TV show with id 99999 not found
+        "500":
+          description: Internal server error or TMDB API failure.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /v1/ratings/{mediaType}/{mediaId}:
+    get:
+      tags:
+        - Ratings
+      summary: Get all ratings for a media item
+      description: Returns all ratings for a given media type and ID.
+      parameters:
+        - name: mediaType
+          in: path
+          required: true
+          schema:
+            type: string
+            enum:
+              - movie
+              - tv
+              - book
+          example: movie
+        - name: mediaId
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+          example: 550
+      responses:
+        "200":
+          description: List of ratings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Rating"
+        "400":
+          description: Invalid parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: Invalid mediaId
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /v1/ratings/{mediaType}/{mediaId}/{userId}:
+    get:
+      tags:
+        - Ratings
+      summary: Get a user's rating for a media item
+      description: Returns the rating a specific user gave to a specific media item.
+      parameters:
+        - name: mediaType
+          in: path
+          required: true
+          schema:
+            type: string
+            enum:
+              - movie
+              - tv
+              - book
+          example: movie
+        - name: mediaId
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+          example: 550
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+          example: 1
+      responses:
+        "200":
+          description: Rating found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Rating"
+        "400":
+          description: Invalid parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                invalidMediaId:
+                  summary: Non-integer mediaId
+                  value:
+                    error: Invalid mediaId
+                invalidUserId:
+                  summary: Non-integer userId
+                  value:
+                    error: Invalid userId
+        "404":
+          description: Rating not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: Rating not found
+  /v1/ratings:
+    post:
+      tags:
+        - Ratings
+      summary: Create a rating
+      description: >
+        Creates a new rating for the authenticated user. If the user already has
+        a review for the same media item without a linked rating, that review's
+        `ratingId` is automatically updated to reference the new rating. Returns
+        409 if the user has already rated this item.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - mediaId
+                - mediaType
+                - score
+              properties:
+                mediaId:
+                  type: integer
+                  minimum: 0
+                  example: 550
+                mediaType:
+                  type: string
+                  enum:
+                    - movie
+                    - tv
+                    - book
+                  example: movie
+                score:
+                  type: integer
+                  minimum: 1
+                  maximum: 10
+                  example: 8
+      responses:
+        "201":
+          description: Rating created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Rating"
+        "400":
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                missingFields:
+                  summary: Required fields missing
+                  value:
+                    error: mediaId, mediaType, and score are required
+                invalidMediaId:
+                  summary: mediaId is not an integer
+                  value:
+                    error: mediaId must be an integer
+                negativeMediaId:
+                  summary: mediaId is negative
+                  value:
+                    error: mediaId must not be negative
+                invalidScore:
+                  summary: Score out of range
+                  value:
+                    error: score must be a number between 1 and 10
+                invalidMediaType:
+                  summary: Unknown mediaType
+                  value:
+                    error: "mediaType must be one of: movie, tv, book"
+        "401":
+          description: Unauthorized — JWT required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: Rating already exists — use PUT to update
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: You have already rated this item. Use PUT to update your rating.
+  /v1/ratings/{id}:
+    put:
+      tags:
+        - Ratings
+      summary: Update a rating
+      description: Updates the score of an existing rating belonging to the
+        authenticated user.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+          example: 42
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - score
+              properties:
+                score:
+                  type: integer
+                  minimum: 1
+                  maximum: 10
+                  example: 9
+      responses:
+        "200":
+          description: Rating updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Rating"
+        "400":
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: score must be a number between 1 and 10
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Forbidden — not the owner
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Rating not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      tags:
+        - Ratings
+      summary: Delete a rating
+      description: >
+        Deletes a rating belonging to the authenticated user. Any review that
+        was linked to this rating will have its `ratingId` automatically cleared
+        to null.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+          example: 42
+      responses:
+        "204":
+          description: Rating deleted
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Forbidden — not the owner
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Rating not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /v1/reviews/{mediaType}/{mediaId}:
+    get:
+      tags:
+        - Reviews
+      summary: Get all reviews for a media item
+      description: Returns all reviews for a given media type and ID.
+      parameters:
+        - name: mediaType
+          in: path
+          required: true
+          schema:
+            type: string
+            enum:
+              - movie
+              - tv
+              - book
+          example: movie
+        - name: mediaId
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+          example: 550
+      responses:
+        "200":
+          description: List of reviews
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Review"
+        "400":
+          description: Invalid parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: Invalid mediaId
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /v1/reviews/{mediaType}/{mediaId}/{userId}:
+    get:
+      tags:
+        - Reviews
+      summary: Get a user's review for a media item
+      description: Returns the review a specific user wrote for a specific media item.
+      parameters:
+        - name: mediaType
+          in: path
+          required: true
+          schema:
+            type: string
+            enum:
+              - movie
+              - tv
+              - book
+          example: movie
+        - name: mediaId
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+          example: 550
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+          example: 1
+      responses:
+        "200":
+          description: Review found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Review"
+        "400":
+          description: Invalid parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                invalidMediaId:
+                  summary: Non-integer mediaId
+                  value:
+                    error: Invalid mediaId
+                invalidUserId:
+                  summary: Non-integer userId
+                  value:
+                    error: Invalid userId
+        "404":
+          description: Review not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: Review not found
+  /v1/reviews:
+    post:
+      tags:
+        - Reviews
+      summary: Create a review
+      description: >
+        Creates a new review for the authenticated user. Do not supply
+        `ratingId` in the request body — if the user already has a rating for
+        the same media item, it is automatically linked. If no rating exists
+        yet, `ratingId` will be null and is linked automatically when a rating
+        is later created. Returns 409 if the user has already reviewed this
+        item.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - mediaId
+                - mediaType
+                - body
+              properties:
+                mediaId:
+                  type: integer
+                  minimum: 0
+                  example: 550
+                mediaType:
+                  type: string
+                  enum:
+                    - movie
+                    - tv
+                    - book
+                  example: movie
+                body:
+                  type: string
+                  example: This movie was incredible!
+      responses:
+        "201":
+          description: Review created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Review"
+        "400":
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                missingFields:
+                  summary: Required fields missing
+                  value:
+                    error: mediaId, mediaType, and body are required
+                invalidMediaId:
+                  summary: mediaId is not an integer
+                  value:
+                    error: mediaId must be an integer
+                negativeMediaId:
+                  summary: mediaId is negative
+                  value:
+                    error: mediaId must not be negative
+        "401":
+          description: Unauthorized — JWT required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: Review already exists — use PUT to update
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: You have already reviewed this item. Use PUT to update your review.
+  /v1/reviews/{id}:
+    put:
+      tags:
+        - Reviews
+      summary: Update a review
+      description: Updates the body of an existing review belonging to the
+        authenticated user.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+          example: 7
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - body
+              properties:
+                body:
+                  type: string
+                  example: Updated review text.
+      responses:
+        "200":
+          description: Review updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Review"
+        "400":
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Forbidden — not the owner
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Review not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      tags:
+        - Reviews
+      summary: Delete a review
+      description: Deletes a review. The owner or an Admin may delete.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+          example: 7
+      responses:
+        "204":
+          description: Review deleted
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Forbidden — not the owner or an Admin
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Review not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /v1/reviews/admin/{id}:
+    delete:
+      tags:
+        - Reviews
+      summary: Delete a review (Admin)
+      description: Deletes any review as an administrator. Requires the Admin role or
+        higher.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+          example: 7
+      responses:
+        "204":
+          description: Review deleted
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Forbidden — Admin role required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Review not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /v1/reviews/me:
+    get:
+      tags:
+        - Reviews
+      summary: Get the authenticated user's reviews
+      description: >
+        Returns all reviews written by the authenticated user. Identity is
+        derived from the JWT `sub` claim — no client-supplied user ID is
+        trusted.
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: List of the caller's reviews
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Review"
+              example:
+                - id: 7
+                  userId: 1
+                  mediaId: 550
+                  mediaType: movie
+                  body: An incredible film that changed my perspective.
+                  ratingId: 42
+                  createdAt: 2026-04-01T10:00:00.000Z
+                  updatedAt: 2026-04-01T10:00:00.000Z
+                  author:
+                    id: 1
+                    displayName: Alice Smith
+        "401":
+          description: Unauthorized — JWT required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /v1/issues:
+    post:
+      tags:
+        - Issues
+      summary: Submit a bug report
+      description: Accepts a visitor bug report and persists it as an issue. No auth
+        required.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IssueSubmission"
+      responses:
+        "201":
+          description: Bug report accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IssueSubmissionResponse"
+        "400":
+          description: Validation failure — title and description are both required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorWithDetails"
+              example:
+                error: Invalid bug report
+                details:
+                  - title is required
+                  - description is required
+        "500":
+          description: Failed to save bug report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    get:
+      tags:
+        - Issues
+      summary: List all issues (Admin)
+      description: >
+        Returns a paginated list of all submitted issues. Requires Admin role or
+        higher. Results can be filtered by status and sorted by creation date.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: Page number (1-based).
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          example: 1
+        - name: limit
+          in: query
+          description: Number of results per page. Maximum 100.
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+          example: 20
+        - name: status
+          in: query
+          description: Comma-separated list of statuses to filter by. Allowed values —
+            Open, InProgress, Resolved, Closed.
+          required: false
+          schema:
+            type: string
+          example: Open,InProgress
+        - name: sort
+          in: query
+          description: Sort order by creation date. Defaults to newest.
+          required: false
+          schema:
+            type: string
+            enum:
+              - newest
+              - oldest
+            default: newest
+          example: newest
+      responses:
+        "200":
+          description: Paginated list of issues
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IssueListResponse"
+        "400":
+          description: Invalid status filter value
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorWithDetails"
+              example:
+                error: Invalid status value(s)
+                details: "Unknown: Pending. Allowed: Open, InProgress, Resolved, Closed"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Forbidden — Admin role required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /v1/issues/{id}:
+    get:
+      tags:
+        - Issues
+      summary: Get an issue by ID (Admin)
+      description: Returns a single issue by its ID. Requires Admin role or higher.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          example: 12
+      responses:
+        "200":
+          description: Issue found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Issue"
+        "400":
+          description: Invalid issue ID
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: Invalid issue id
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Forbidden — Admin role required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Issue not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: Issue not found
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    patch:
+      tags:
+        - Issues
+      summary: Update an issue's status (Admin)
+      description: >
+        Partially updates an issue. Only the `status` field is accepted.
+        Requires Admin role or higher.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          example: 12
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  type: string
+                  enum:
+                    - Open
+                    - InProgress
+                    - Resolved
+                    - Closed
+                  example: InProgress
+      responses:
+        "200":
+          description: Issue updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Issue"
+        "400":
+          description: Missing or invalid status value
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                missingStatus:
+                  summary: No status field provided
+                  value:
+                    error: Request body must include a status field
+                invalidStatus:
+                  summary: Unknown status value
+                  value:
+                    error: Invalid status value
+                    details: "Allowed values: Open, InProgress, Resolved, Closed"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Forbidden — Admin role required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Issue not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      tags:
+        - Issues
+      summary: Delete an issue (Admin)
+      description: Permanently deletes an issue. Requires Admin role or higher.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          example: 12
+      responses:
+        "204":
+          description: Issue deleted
+        "400":
+          description: Invalid issue ID
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Forbidden — Admin role required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Issue not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /v1/ratings/me:
+    get:
+      tags:
+        - Ratings
+      summary: Get the authenticated user's ratings
+      description: >
+        Returns all ratings belonging to the authenticated user. Identity is
+        derived from the JWT `sub` claim — no client-supplied user ID is
+        trusted.
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: List of the caller's ratings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Rating"
+              example:
+                - id: 1
+                  userId: 1
+                  mediaId: 550
+                  mediaType: movie
+                  score: 8
+                  createdAt: 2024-01-01T00:00:00.000Z
+                  updatedAt: 2024-01-01T00:00:00.000Z
+                  reviewId: 3
+                  author:
+                    id: 1
+                    displayName: Alice Smith
+                - id: 2
+                  userId: 1
+                  mediaId: 278
+                  mediaType: movie
+                  score: 10
+                  createdAt: 2024-02-01T00:00:00.000Z
+                  updatedAt: 2024-02-01T00:00:00.000Z
+                  reviewId: null
+                  author:
+                    id: 1
+                    displayName: Alice Smith
+        "401":
+          description: Unauthorized — JWT required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /v1/discover/top-rated:
+    get:
+      tags:
+        - Discovery
+      summary: Get community top-rated movies and TV shows
+      description: >
+        Returns up to 20 movies and TV shows ranked by community average rating.
+        Requires a minimum of 10 ratings to filter out items with too few votes.
+        Each result is enriched with TMDB metadata. Items whose TMDB record
+        cannot be found are silently omitted. Public route — no auth required.
+      responses:
+        "200":
+          description: List of top-rated items enriched with TMDB metadata.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DiscoveryItem"
+              example:
+                - mediaId: 550
+                  mediaType: movie
+                  community_rating: 9.2
+                  community_rating_count: 15
+                  tmdb:
+                    title: Fight Club
+                    poster_path: /pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg
+                    backdrop_path: /fCayJrkfRaCRCTh8GqN30f8oyQF.jpg
+                    overview: A ticking-time-bomb insomniac and a slippery soap salesman channel
+                      primal male aggression into a brawling underground club.
+                    genres:
+                      - id: 18
+                        name: Drama
+                    release_date: 1999-10-15
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /v1/discover/most-reviewed:
+    get:
+      tags:
+        - Discovery
+      summary: Get community most-reviewed movies and TV shows
+      description: >
+        Returns up to 20 movies and TV shows ranked by total number of community
+        ratings, regardless of score. Each result is enriched with TMDB
+        metadata. Items whose TMDB record cannot be found are silently omitted.
+        Public route — no auth required.
+      responses:
+        "200":
+          description: List of most-reviewed items enriched with TMDB metadata.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DiscoveryItem"
+              example:
+                - mediaId: 1396
+                  mediaType: tv
+                  community_rating: 8.8
+                  community_rating_count: 42
+                  tmdb:
+                    name: Breaking Bad
+                    poster_path: /ggFHVNu6YYI5L9pCfOacjizRGt.jpg
+                    backdrop_path: /tsRy63Mu5cu8etL1X7ZLyf7UP1M.jpg
+                    overview: When Walter White, a New Mexico chemistry teacher diagnosed with
+                      cancer, turns to manufacturing methamphetamine to secure
+                      his family's future.
+                    genres:
+                      - id: 18
+                        name: Drama
+                      - id: 80
+                        name: Crime
+                    first_air_date: 2008-01-20
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: >
+        JWT issued by **Auth²** (`https://iam.onrender.com`).
+
+        Required claims:
+
+        - `iss`: `https://iam.onrender.com`
+
+        - `aud`: `group-5-api`
+
+        - `role`: one of `User`, `Moderator`, `Admin`, `SuperAdmin`, `Owner`
+
+        Tokens are RS256-signed and verified via the Auth² JWKS endpoint at
+        `https://iam.onrender.com/.well-known/jwks.json`. Obtain a token from
+        Auth² and pass it as `Authorization: Bearer <token>`.
+      x-issuer: https://iam.onrender.com
+      x-audience: group-5-api
+  schemas:
+    MovieSummary:
+      type: object
+      description: A condensed movie object returned from list endpoints.
+      properties:
+        id:
+          type: integer
+          description: The TMDB movie ID.
+          example: 557
+        title:
+          type: string
+          description: The movie title.
+          example: Spider-Man
+        backdrop_path:
+          type: string
+          nullable: true
+          description: Relative path to the backdrop image on TMDB's image CDN.
+          example: /zQ8AxTPiCiS5nnwXpwTBPBHSaa5.jpg
+        poster_path:
+          type: string
+          nullable: true
+          description: Relative path to the poster image on TMDB's image CDN.
+          example: /kjdJntyBeEvqm9w97QGBdxPptzj.jpg
+    MovieDetail:
+      type: object
+      description: Detailed movie information returned from the single movie endpoint.
+      properties:
+        title:
+          type: string
+          example: Star Wars
+        original_title:
+          type: string
+          example: Star Wars
+        overview:
+          type: string
+          example: A long time ago in a galaxy far, far away...
+        tagline:
+          type: string
+          example: A long time ago in a galaxy far, far away....
+        runtime:
+          type: integer
+          example: 121
+        release_date:
+          type: string
+          format: date
+          example: 1977-05-25
+        status:
+          type: string
+          example: Released
+        adult:
+          type: boolean
+          example: false
+        genre_ids:
+          type: array
+          items:
+            type: integer
+          example:
+            - 12
+        genres:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              name:
+                type: string
+          example:
+            - id: 12
+              name: Adventure
+        original_language:
+          type: string
+          example: en
+        spoken_languages:
+          type: array
+          items:
+            type: object
+            properties:
+              english_name:
+                type: string
+              iso_639_1:
+                type: string
+              name:
+                type: string
+          example:
+            - english_name: English
+              iso_639_1: en
+              name: English
+        budget:
+          type: integer
+          example: 11000000
+        revenue:
+          type: integer
+          example: 775398007
+        poster_path:
+          type: string
+          nullable: true
+          example: /6FfCtAuVAW8XJjZ7eWeLibRLWTw.jpg
+        backdrop_path:
+          type: string
+          nullable: true
+          example: /2w4xG178RpB4MDAIfTkqAuSJzec.jpg
+        imdb_id:
+          type: string
+          example: tt0076759
+        production_companies:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              name:
+                type: string
+              logo_path:
+                type: string
+                nullable: true
+              origin_country:
+                type: string
+        production_countries:
+          type: array
+          items:
+            type: object
+            properties:
+              iso_3166_1:
+                type: string
+              name:
+                type: string
+        belongs_to_collection:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            poster_path:
+              type: string
+              nullable: true
+            backdrop_path:
+              type: string
+              nullable: true
+    TvSummary:
+      type: object
+      description: A condensed TV show object returned from list endpoints.
+      properties:
+        id:
+          type: integer
+          description: The TMDB TV show ID.
+          example: 1396
+        name:
+          type: string
+          description: The TV show name.
+          example: Breaking Bad
+        backdrop_path:
+          type: string
+          nullable: true
+          description: Relative path to the backdrop image on TMDB's image CDN.
+          example: /tsRy63Mu5cu8etL1X7ZLyf7UP1M.jpg
+        poster_path:
+          type: string
+          nullable: true
+          description: Relative path to the poster image on TMDB's image CDN.
+          example: /ggFHVNu6YYI5L9pCfOacjizRGt.jpg
+    TvDetail:
+      type: object
+      description: Detailed TV show information returned from the single TV endpoint.
+      properties:
+        name:
+          type: string
+          example: Breaking Bad
+        original_name:
+          type: string
+          example: Breaking Bad
+        overview:
+          type: string
+          example: A chemistry teacher diagnosed with cancer turns to manufacturing drugs.
+        tagline:
+          type: string
+          nullable: true
+          example: Change the equation.
+        first_air_date:
+          type: string
+          format: date
+          example: 2008-01-20
+        last_air_date:
+          type: string
+          format: date
+          nullable: true
+          example: 2013-09-29
+        status:
+          type: string
+          example: Ended
+        type:
+          type: string
+          example: Scripted
+        adult:
+          type: boolean
+          example: false
+        genres:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              name:
+                type: string
+          example:
+            - id: 18
+              name: Drama
+        original_language:
+          type: string
+          example: en
+        spoken_languages:
+          type: array
+          items:
+            type: object
+            properties:
+              english_name:
+                type: string
+              iso_639_1:
+                type: string
+              name:
+                type: string
+        origin_country:
+          type: array
+          items:
+            type: string
+          example:
+            - US
+        number_of_episodes:
+          type: integer
+          example: 62
+        number_of_seasons:
+          type: integer
+          example: 5
+        seasons:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              name:
+                type: string
+              episode_count:
+                type: integer
+              air_date:
+                type: string
+                format: date
+                nullable: true
+        episode_run_time:
+          type: array
+          items:
+            type: integer
+          example:
+            - 45
+        last_episode_to_air:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            episode_number:
+              type: integer
+            season_number:
+              type: integer
+        next_episode_to_air:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            episode_number:
+              type: integer
+            season_number:
+              type: integer
+        networks:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              name:
+                type: string
+              logo_path:
+                type: string
+                nullable: true
+              origin_country:
+                type: string
+        production_companies:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              name:
+                type: string
+              logo_path:
+                type: string
+                nullable: true
+              origin_country:
+                type: string
+        production_countries:
+          type: array
+          items:
+            type: object
+            properties:
+              iso_3166_1:
+                type: string
+              name:
+                type: string
+        created_by:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              name:
+                type: string
+              profile_path:
+                type: string
+                nullable: true
+    Rating:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 42
+        userId:
+          type: integer
+          example: 1
+        mediaId:
+          type: integer
+          example: 550
+        mediaType:
+          type: string
+          enum:
+            - movie
+            - tv
+            - book
+          example: movie
+        score:
+          type: integer
+          minimum: 1
+          maximum: 10
+          example: 8
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        reviewId:
+          type: integer
+          nullable: true
+          description: ID of the linked review, if one exists
+          example: 3
+        author:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 1
+            displayName:
+              type: string
+              example: Alice Smith
+    Review:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 7
+        userId:
+          type: integer
+          example: 1
+        mediaId:
+          type: integer
+          example: 550
+        mediaType:
+          type: string
+          enum:
+            - movie
+            - tv
+            - book
+          example: movie
+        ratingId:
+          type: integer
+          nullable: true
+          example: 42
+        body:
+          type: string
+          example: This movie was incredible!
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        author:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 1
+            displayName:
+              type: string
+              example: Alice Smith
+    Issue:
+      type: object
+      description: A full issue record as stored in the database.
+      properties:
+        id:
+          type: integer
+          example: 12
+        title:
+          type: string
+          nullable: true
+          example: Unable to load movie list
+        description:
+          type: string
+          nullable: true
+          example: The discovery endpoint returns 500 when date filters are applied.
+        reproSteps:
+          type: string
+          nullable: true
+          example: 1. GET /v1/movies?primary_release_date_gte=2020-01-01
+        reporter:
+          type: string
+          nullable: true
+          example: alice@example.com
+        status:
+          type: string
+          enum:
+            - Open
+            - InProgress
+            - Resolved
+            - Closed
+          example: Open
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    IssueListResponse:
+      type: object
+      description: Paginated list of issues returned by the admin list endpoint.
+      properties:
+        issues:
+          type: array
+          items:
+            $ref: "#/components/schemas/Issue"
+        total:
+          type: integer
+          description: Total number of issues matching the filter.
+          example: 57
+        page:
+          type: integer
+          description: Current page number.
+          example: 1
+        limit:
+          type: integer
+          description: Number of results per page.
+          example: 20
+        pages:
+          type: integer
+          description: Total number of pages.
+          example: 3
+    IssueSubmission:
+      type: object
+      description: Payload for creating a public issue report. Both title and
+        description are required.
+      required:
+        - title
+        - description
+      properties:
+        title:
+          type: string
+          example: Unable to load list of movies
+          description: A short summary of the bug.
+        description:
+          type: string
+          example: The movie discovery endpoint returns 500 when search includes dates.
+          description: A detailed description of the problem.
+        reproSteps:
+          type: string
+          example: 1. Open /v1/movies 2. Set primary_release_date_gte=2020-01-01 3. Send
+            request
+          description: Optional reproduction steps or expected behavior.
+        reporter:
+          type: string
+          example: alice@example.com
+          description: Optional name or identifier of the reporter.
+    IssueSubmissionResponse:
+      type: object
+      properties:
+        issueId:
+          type: integer
+          example: 123
+        status:
+          type: string
+          example: Open
+        message:
+          type: string
+          example: Bug report submitted successfully
+        createdAt:
+          type: string
+          format: date-time
+          example: 2026-05-02T13:04:00.000Z
+    EnrichedRating:
+      type: object
+      description: A user's rating paired with TMDB metadata for that item.
+      properties:
+        rating:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 1
+            score:
+              type: integer
+              minimum: 1
+              maximum: 10
+              example: 8
+            mediaId:
+              type: integer
+              example: 550
+            mediaType:
+              type: string
+              enum:
+                - movie
+                - tv
+                - book
+              example: movie
+            createdAt:
+              type: string
+              format: date-time
+        tmdb:
+          description: TMDB metadata for the rated item. Null for books or if the item was
+            removed from TMDB.
+          nullable: true
+          oneOf:
+            - $ref: "#/components/schemas/MovieDetail"
+            - $ref: "#/components/schemas/TvDetail"
+    MovieTmdbSummary:
+      type: object
+      description: Trimmed TMDB movie metadata returned by the discovery endpoints.
+      properties:
+        title:
+          type: string
+          example: Fight Club
+        poster_path:
+          type: string
+          nullable: true
+          example: /pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg
+        backdrop_path:
+          type: string
+          nullable: true
+          example: /fCayJrkfRaCRCTh8GqN30f8oyQF.jpg
+        overview:
+          type: string
+          example: A ticking-time-bomb insomniac and a slippery soap salesman channel
+            primal male aggression into a brawling underground club.
+        genres:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              name:
+                type: string
+          example:
+            - id: 18
+              name: Drama
+        release_date:
+          type: string
+          format: date
+          example: 1999-10-15
+    TvTmdbSummary:
+      type: object
+      description: Trimmed TMDB TV show metadata returned by the discovery endpoints.
+      properties:
+        name:
+          type: string
+          example: Breaking Bad
+        poster_path:
+          type: string
+          nullable: true
+          example: /ggFHVNu6YYI5L9pCfOacjizRGt.jpg
+        backdrop_path:
+          type: string
+          nullable: true
+          example: /tsRy63Mu5cu8etL1X7ZLyf7UP1M.jpg
+        overview:
+          type: string
+          example: A chemistry teacher diagnosed with cancer turns to manufacturing drugs
+            to secure his family's future.
+        genres:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              name:
+                type: string
+          example:
+            - id: 18
+              name: Drama
+        first_air_date:
+          type: string
+          format: date
+          example: 2008-01-20
+    DiscoveryItem:
+      type: object
+      description: An aggregated community result enriched with TMDB metadata.
+      properties:
+        mediaId:
+          type: integer
+          example: 550
+        mediaType:
+          type: string
+          enum:
+            - movie
+            - tv
+          example: movie
+        community_rating:
+          type: number
+          format: float
+          nullable: true
+          example: 9.2
+        community_rating_count:
+          type: integer
+          example: 15
+        tmdb:
+          description: Trimmed TMDB metadata for this item. Null if the TMDB lookup failed.
+          nullable: true
+          oneOf:
+            - $ref: "#/components/schemas/MovieTmdbSummary"
+            - $ref: "#/components/schemas/TvTmdbSummary"
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: A human-readable error message.
+          example: Not found
+    ErrorWithDetails:
+      type: object
+      description: Error response that includes an additional details field for
+        structured validation feedback.
+      properties:
+        error:
+          type: string
+          description: A human-readable error message.
+          example: Invalid bug report
+        details:
+          oneOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+          description: Additional context — either a plain string or a list of specific
+            validation errors.
+          example:
+            - A title or description is required

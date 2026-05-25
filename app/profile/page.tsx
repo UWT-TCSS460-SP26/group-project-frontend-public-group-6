@@ -24,6 +24,15 @@ export default async function ProfilePage() {
           <a href="https://jwt.io" target="_blank" rel="noreferrer">jwt.io</a>{" "}
           to verify <code>iss</code> and <code>aud</code> are correct.
         </p>
+        <ul style={{ color: "#6b7280", fontSize: "0.9rem", marginTop: "8px" }}>
+          <li>
+            <code>iss</code> should be{" "}
+            <code>https://tcss-460-iam.onrender.com</code>
+          </li>
+          <li>
+            <code>aud</code> should be <code>group-5-api</code>
+          </li>
+        </ul>
         <textarea
           readOnly
           defaultValue={session.accessToken ?? "(no token)"}

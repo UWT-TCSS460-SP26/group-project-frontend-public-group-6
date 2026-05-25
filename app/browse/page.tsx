@@ -1,48 +1,174 @@
 import MediaCard from "@/components/MediaCard";
+import BrowseFilters from "./BrowseFilters";
+import {
+  buildMovieQuery,
+  buildTvQuery,
+  hasDiscoverFilters,
+  hasMovieDiscoverFilters,
+  hasTvDiscoverFilters,
+  parseMediaType,
+  type BrowseSearchParams,
+} from "@/lib/browse-params";
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL!;
 
 type MovieSummary = { id: number; title: string; poster_path: string | null };
 type TvSummary = { id: number; name: string; poster_path: string | null };
 
-export default async function BrowsePage() {
-  const [moviesRes, tvRes] = await Promise.all([
-    fetch(`${API}/v1/movies/popular?limit=20`, { next: { revalidate: 300 } }),
-    fetch(`${API}/v1/tv/popular?limit=20`, { next: { revalidate: 300 } }),
+type FetchResult<T> = { items: T[]; ok: boolean; status: number };
+
+async function fetchMovies(
+  params: BrowseSearchParams,
+  useDiscover: boolean
+): Promise<FetchResult<MovieSummary>> {
+  const path = useDiscover
+    ? `/v1/movies?${buildMovieQuery(params)}`
+    : "/v1/movies/popular?limit=20";
+  const res = await fetch(`${API}${path}`, { next: { revalidate: 300 } });
+  return {
+    items: res.ok ? await res.json() : [],
+    ok: res.ok,
+    status: res.status,
+  };
+}
+
+async function fetchTv(
+  params: BrowseSearchParams,
+  useDiscover: boolean
+): Promise<FetchResult<TvSummary>> {
+  const path = useDiscover
+    ? `/v1/tv?${buildTvQuery(params)}`
+    : "/v1/tv/popular?limit=20";
+  const res = await fetch(`${API}${path}`, { next: { revalidate: 300 } });
+  return {
+    items: res.ok ? await res.json() : [],
+    ok: res.ok,
+    status: res.status,
+  };
+}
+
+export default async function BrowsePage({
+  searchParams,
+}: {
+  searchParams: Promise<BrowseSearchParams>;
+}) {
+  const raw = await searchParams;
+  const mediaType = parseMediaType(raw.type);
+  const useMovieDiscover = hasMovieDiscoverFilters(raw);
+  const useTvDiscover = hasTvDiscoverFilters(raw);
+  const useDiscover = hasDiscoverFilters(raw);
+  const showMovies = mediaType === "all" || mediaType === "movie";
+  const showTv = mediaType === "all" || mediaType === "tv";
+
+  const [moviesResult, tvResult] = await Promise.all([
+    showMovies ? fetchMovies(raw, useMovieDiscover) : Promise.resolve({ items: [], ok: true, status: 200 }),
+    showTv ? fetchTv(raw, useTvDiscover) : Promise.resolve({ items: [], ok: true, status: 200 }),
   ]);
 
-  const movies: MovieSummary[] = moviesRes.ok ? await moviesRes.json() : [];
-  const tvShows: TvSummary[] = tvRes.ok ? await tvRes.json() : [];
+  const movies = moviesResult.items;
+  const tvShows = tvResult.items;
+  const moviesApiFailed = showMovies && !moviesResult.ok;
+  const tvApiFailed = showTv && !tvResult.ok;
+  const apiFailed = moviesApiFailed || tvApiFailed;
+
+  const heading = useDiscover ? "Browse & Discover" : "Browse Popular";
+  const subtitle = useDiscover
+    ? "Results from your partner's discover endpoints (filters applied)."
+    : "Popular titles from your upstream partner. Apply filters to use discover.";
 
   return (
     <div style={{ maxWidth: "1100px" }}>
-      <h1>Browse Popular</h1>
+      <h1>{heading}</h1>
+      <p style={{ color: "#6b7280", marginTop: "0", marginBottom: "20px" }}>{subtitle}</p>
 
-      <section>
-        <h2>Movies</h2>
-        {movies.length === 0 ? (
-          <p style={{ color: "#6b7280" }}>No movies available right now.</p>
-        ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: "16px" }}>
-            {movies.map((m) => (
-              <MediaCard key={m.id} id={m.id} title={m.title} posterPath={m.poster_path} href={`/movie/${m.id}`} />
-            ))}
-          </div>
-        )}
-      </section>
+      <BrowseFilters mediaType={mediaType} params={raw} />
 
-      <section style={{ marginTop: "40px" }}>
-        <h2>TV Shows</h2>
-        {tvShows.length === 0 ? (
-          <p style={{ color: "#6b7280" }}>No TV shows available right now.</p>
-        ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: "16px" }}>
-            {tvShows.map((t) => (
-              <MediaCard key={t.id} id={t.id} title={t.name} posterPath={t.poster_path} href={`/tv/${t.id}`} />
-            ))}
-          </div>
-        )}
-      </section>
+      {apiFailed && (
+        <p
+          role="alert"
+          style={{
+            color: "#b91c1c",
+            background: "#fef2f2",
+            border: "1px solid #fecaca",
+            borderRadius: "8px",
+            padding: "12px 16px",
+            marginBottom: "20px",
+          }}
+        >
+          Could not load from the partner API ({API}
+          {moviesApiFailed ? ` — movies: ${moviesResult.status}` : ""}
+          {tvApiFailed ? ` — TV: ${tvResult.status}` : ""}). Confirm{" "}
+          <code>NEXT_PUBLIC_API_BASE_URL</code> is Group 5&apos;s deployed API (
+          <code>https://tcss460-group-5-api.onrender.com</code>), then restart{" "}
+          <code>npm run dev</code>.
+        </p>
+      )}
+
+      {showMovies && (
+        <section>
+          <h2>Movies</h2>
+          {movies.length === 0 ? (
+            <p style={{ color: "#6b7280" }}>
+              {moviesApiFailed
+                ? "Movies could not be loaded."
+                : useMovieDiscover
+                  ? "No movies match these filters."
+                  : "No popular movies returned right now."}
+            </p>
+          ) : (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))",
+                gap: "16px",
+              }}
+            >
+              {movies.map((m) => (
+                <MediaCard
+                  key={m.id}
+                  id={m.id}
+                  title={m.title}
+                  posterPath={m.poster_path}
+                  href={`/movie/${m.id}`}
+                />
+              ))}
+            </div>
+          )}
+        </section>
+      )}
+
+      {showTv && (
+        <section style={{ marginTop: showMovies ? "40px" : 0 }}>
+          <h2>TV Shows</h2>
+          {tvShows.length === 0 ? (
+            <p style={{ color: "#6b7280" }}>
+              {tvApiFailed
+                ? "TV shows could not be loaded."
+                : useTvDiscover
+                  ? "No TV shows match these filters."
+                  : "No popular TV shows returned right now."}
+            </p>
+          ) : (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))",
+                gap: "16px",
+              }}
+            >
+              {tvShows.map((t) => (
+                <MediaCard
+                  key={t.id}
+                  id={t.id}
+                  title={t.name}
+                  posterPath={t.poster_path}
+                  href={`/tv/${t.id}`}
+                />
+              ))}
+            </div>
+          )}
+        </section>
+      )}
     </div>
   );
 }

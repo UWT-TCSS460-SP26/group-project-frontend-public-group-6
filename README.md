@@ -1,4 +1,4 @@
-# MovieBrowse - Group 6 Consumer App (Sprint 6)
+# MediaBrowse - Group 6 Consumer App (Sprint 6)
 
 Next.js 15 consumer front end for TCSS 460. This app signs in through Auth2 (NextAuth) and reads movies and TV shows from our **upstream partner, Group 5**.
 

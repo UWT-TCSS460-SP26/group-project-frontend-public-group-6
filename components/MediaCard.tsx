@@ -11,39 +11,18 @@ type Props = {
 
 export default function MediaCard({ title, posterPath, href }: Props) {
   return (
-    <Link href={href} style={{ textDecoration: "none", color: "inherit" }}>
-      <div style={{
-        borderRadius: "8px",
-        overflow: "hidden",
-        border: "1px solid #e5e7eb",
-        background: "#f9fafb",
-        cursor: "pointer",
-      }}>
-        {posterPath ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={`${TMDB_IMG}${posterPath}`}
-            alt={title}
-            style={{ width: "100%", display: "block", aspectRatio: "2/3", objectFit: "cover" }}
-          />
-        ) : (
-          <div style={{
-            width: "100%",
-            aspectRatio: "2/3",
-            background: "#e5e7eb",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            color: "#9ca3af",
-            fontSize: "0.8rem",
-          }}>
-            No poster
-          </div>
-        )}
-        <div style={{ padding: "8px", fontSize: "0.85rem", fontWeight: 500, lineHeight: 1.3 }}>
-          {title}
+    <Link href={href} className="media-card">
+      {posterPath ? (
+        <div className="media-card__thumb">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={`${TMDB_IMG}${posterPath}`} alt={title} />
         </div>
-      </div>
+      ) : (
+        <div className="media-card__thumb media-card__thumb--empty">
+          No poster available
+        </div>
+      )}
+      <div className="media-card__title">{title}</div>
     </Link>
   );
 }

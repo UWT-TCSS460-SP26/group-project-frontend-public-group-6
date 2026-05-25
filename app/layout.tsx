@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Header from "@/components/Header";
+import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "MovieBrowse",
+  title: "Media Browse",
   description: "Sprint 6 Consumer App",
 };
 
@@ -13,9 +14,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body style={{ margin: 0, fontFamily: "system-ui, sans-serif" }}>
+      <body className="app-shell">
         <Header />
-        <main style={{ padding: "24px" }}>{children}</main>
+        <main>{children}</main>
       </body>
     </html>
   );

@@ -1,64 +1,56 @@
 import Link from "next/link";
+import ThemeToggle from "@/components/ThemeToggle";
 import { auth, signIn, signOut } from "@/auth";
 
 export default async function Header() {
   const session = await auth();
 
   return (
-    <header style={{
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-      padding: "12px 24px",
-      borderBottom: "1px solid #e5e7eb",
-      background: "#fff",
-    }}>
-      <Link href="/" style={{ fontWeight: 700, fontSize: "1.2rem", textDecoration: "none", color: "#111" }}>
-        🎬 MovieBrowse
+    <header className="site-header">
+      <Link href="/" className="site-logo">
+        🎬 Media Browse
       </Link>
 
-      <nav style={{ display: "flex", gap: "16px", alignItems: "center" }}>
-        <Link href="/browse">Browse</Link>
-        <Link href="/search">Search</Link>
+      <nav className="site-nav">
+        <Link href="/browse" className="nav-link">
+          Browse
+        </Link>
+        <Link href="/search" className="nav-link">
+          Search
+        </Link>
+      </nav>
 
+      <div className="nav-actions">
+        <ThemeToggle />
         {session?.user ? (
           <>
-            <Link href="/profile" style={{ color: "#6b7280", fontSize: "0.9rem" }}>
+            <Link href="/profile" className="nav-link">
               {session.user.email}
             </Link>
-            <form action={async () => {
-              "use server";
-              await signOut({ redirectTo: "/" });
-            }}>
-              <button type="submit" style={{
-                padding: "6px 14px",
-                background: "#f3f4f6",
-                border: "1px solid #d1d5db",
-                borderRadius: "6px",
-                cursor: "pointer",
-              }}>
+            <form
+              action={async () => {
+                "use server";
+                await signOut({ redirectTo: "/" });
+              }}
+            >
+              <button type="submit" className="btn btn-secondary">
                 Sign Out
               </button>
             </form>
           </>
         ) : (
-          <form action={async () => {
-            "use server";
-            await signIn("tcss460");
-          }}>
-            <button type="submit" style={{
-              padding: "6px 14px",
-              background: "#2563eb",
-              color: "#fff",
-              border: "none",
-              borderRadius: "6px",
-              cursor: "pointer",
-            }}>
+          <form
+            action={async () => {
+              "use server";
+              await signIn("tcss460");
+            }}
+          >
+            <button type="submit" className="btn btn-primary">
               Sign In
             </button>
           </form>
         )}
-      </nav>
+      </div>
     </header>
   );
 }

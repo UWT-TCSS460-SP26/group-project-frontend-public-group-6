@@ -1,4 +1,6 @@
 import { notFound } from "next/navigation";
+import { auth } from "@/auth";
+import RatingReviewSection from "@/app/components/RatingReviewSection";
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL!;
 const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
@@ -14,20 +16,51 @@ type MovieDetail = {
   poster_path: string | null;
 };
 
+type Rating = {
+  id: number;
+  userId: number;
+  mediaId: number;
+  mediaType: string;
+  score: number;
+  createdAt: string;
+  updatedAt: string;
+  reviewId: number | null;
+  author: { id: number; displayName: string };
+};
+
+type Review = {
+  id: number;
+  userId: number;
+  mediaId: number;
+  mediaType: string;
+  ratingId: number | null;
+  body: string;
+  createdAt: string;
+  updatedAt: string;
+  author: { id: number; displayName: string };
+};
+
 export default async function MovieDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const res = await fetch(`${API}/v1/movies/${id}`, {
-    next: { revalidate: 3600 },
-  });
 
-  if (res.status === 404) notFound();
-  if (!res.ok) throw new Error(`Failed to load movie ${id}`);
+  const [movieRes, ratingsRes, reviewsRes, session] = await Promise.all([
+    fetch(`${API}/v1/movies/${id}`, { next: { revalidate: 3600 } }),
+    fetch(`${API}/v1/ratings/movie/${id}`),
+    fetch(`${API}/v1/reviews/movie/${id}`),
+    auth(),
+  ]);
 
-  const movie: MovieDetail = await res.json();
+  if (movieRes.status === 404) notFound();
+  if (!movieRes.ok) throw new Error(`Failed to load movie ${id}`);
+
+  const movie: MovieDetail = await movieRes.json();
+  const ratings: Rating[] = ratingsRes.ok ? await ratingsRes.json() : [];
+  const reviews: Review[] = reviewsRes.ok ? await reviewsRes.json() : [];
+  const accessToken = session?.accessToken ?? null;
 
   return (
     <div className="page-container">
@@ -73,9 +106,14 @@ export default async function MovieDetailPage({
                 </>
               )}
             </dl>
-            <p className="sprint-note">
-              Sign in to rate this title — coming in Sprint 7.
-            </p>
+
+            <RatingReviewSection
+              mediaType="movie"
+              mediaId={Number(id)}
+              initialRatings={ratings}
+              initialReviews={reviews}
+              accessToken={accessToken ?? null}
+            />
           </div>
         </div>
       </div>

@@ -8,7 +8,10 @@ export default async function Header() {
   return (
     <header className="site-header">
       <Link href="/" className="site-logo">
-        🎬 Media Browse
+        <span className="logo-main">Media Palace</span>
+        <span className="logo-sub">
+         Now Showing Movies & Television
+        </span>
       </Link>
 
       <nav className="site-nav">

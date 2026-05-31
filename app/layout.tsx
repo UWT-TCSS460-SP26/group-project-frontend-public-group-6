@@ -5,8 +5,8 @@ import { Cinzel, Inter } from "next/font/google";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Media Browse",
-  description: "Sprint 6 Consumer App",
+  title: "Media Palace",
+  description: "Classic movie palace experience for movies and television",
 };
 
 const cinzel = Cinzel({
@@ -29,10 +29,34 @@ export default function RootLayout({
       <head>
         <ThemeScript />
       </head>
+
       <body className={`${cinzel.variable} ${inter.variable} app-shell`}>
-        <Header />
-        <main>{children}</main>
-      </body>
+      <ThemeScript />
+
+      {/* Projector beam */}
+      <div className="projector-light" />
+
+      {/* Floating popcorn */}
+      <div className="popcorn popcorn-1">🍿</div>
+      <div className="popcorn popcorn-2">🍿</div>
+      <div className="popcorn popcorn-3">🍿</div>
+      <div className="popcorn popcorn-4">🍿</div>
+      <div className="popcorn popcorn-5">🍿</div>
+
+      {/* Floating dust */}
+      <div className="dust-layer">
+        {Array.from({ length: 18 }).map((_, i) => (
+          <span key={i} className={`dust dust-${i + 1}`} />
+        ))}
+      </div>
+
+      {/* Film reel watermark */}
+      <div className="film-watermark" />
+
+      <Header />
+
+      <main>{children}</main>
+    </body>
     </html>
   );
 }

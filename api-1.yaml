@@ -1,4 +1,4 @@
-openapi: 3.0.3
+2openapi: 3.0.3
 info:
   title: TCSS 460 Group 5 API
   description: |
@@ -26,6 +26,8 @@ tags:
     description: Bug report submission (public) and issue management (Admin+).
   - name: Discovery
     description: Community-ranked discovery feeds. Public — no auth required.
+  - name: People
+    description: Search for media by cast member name.
 paths:
   /health:
     get:
@@ -62,7 +64,8 @@ paths:
       parameters:
         - name: q
           in: query
-          description: Text search query (e.g. "spiderman"). When provided, all filter
+          description:
+            Text search query (e.g. "spiderman"). When provided, all filter
             parameters are ignored.
           required: false
           schema:
@@ -70,7 +73,8 @@ paths:
           example: spiderman
         - name: limit
           in: query
-          description: Maximum number of results to return. Must be a positive integer no
+          description:
+            Maximum number of results to return. Must be a positive integer no
             greater than 50.
           required: false
           schema:
@@ -87,7 +91,8 @@ paths:
           example: en-US
         - name: primary_release_date_gte
           in: query
-          description: Filter movies released on or after this date (YYYY-MM-DD). Only
+          description:
+            Filter movies released on or after this date (YYYY-MM-DD). Only
             applies when `query` is not provided.
           required: false
           schema:
@@ -96,7 +101,8 @@ paths:
           example: 2020-01-01
         - name: primary_release_date_lte
           in: query
-          description: Filter movies released on or before this date (YYYY-MM-DD). Only
+          description:
+            Filter movies released on or before this date (YYYY-MM-DD). Only
             applies when `query` is not provided.
           required: false
           schema:
@@ -105,7 +111,8 @@ paths:
           example: 2024-12-31
         - name: with_genres
           in: query
-          description: Comma-separated list of TMDB genre IDs to filter by. Only applies
+          description:
+            Comma-separated list of TMDB genre IDs to filter by. Only applies
             when `query` is not provided.
           required: false
           schema:
@@ -113,7 +120,8 @@ paths:
           example: 28,878
         - name: with_runtime_gte
           in: query
-          description: Filter by minimum runtime in minutes. Only applies when `query` is
+          description:
+            Filter by minimum runtime in minutes. Only applies when `query` is
             not provided.
           required: false
           schema:
@@ -121,7 +129,8 @@ paths:
           example: 90
         - name: with_runtime_lte
           in: query
-          description: Filter by maximum runtime in minutes. Only applies when `query` is
+          description:
+            Filter by maximum runtime in minutes. Only applies when `query` is
             not provided.
           required: false
           schema:
@@ -171,7 +180,8 @@ paths:
       parameters:
         - name: limit
           in: query
-          description: Maximum number of results to return. Must be a positive integer no
+          description:
+            Maximum number of results to return. Must be a positive integer no
             greater than 50.
           required: false
           schema:
@@ -277,7 +287,8 @@ paths:
       parameters:
         - name: q
           in: query
-          description: Text search query (e.g. "breaking bad"). When provided, all filter
+          description:
+            Text search query (e.g. "breaking bad"). When provided, all filter
             parameters are ignored.
           required: false
           schema:
@@ -285,7 +296,8 @@ paths:
           example: breaking bad
         - name: limit
           in: query
-          description: Maximum number of results to return. Must be a positive integer no
+          description:
+            Maximum number of results to return. Must be a positive integer no
             greater than 50.
           required: false
           schema:
@@ -302,7 +314,8 @@ paths:
           example: en-US
         - name: first_air_date_gte
           in: query
-          description: Filter shows that first aired on or after this date (YYYY-MM-DD).
+          description:
+            Filter shows that first aired on or after this date (YYYY-MM-DD).
             Only applies when `q` is not provided.
           required: false
           schema:
@@ -311,7 +324,8 @@ paths:
           example: 2020-01-01
         - name: first_air_date_lte
           in: query
-          description: Filter shows that first aired on or before this date (YYYY-MM-DD).
+          description:
+            Filter shows that first aired on or before this date (YYYY-MM-DD).
             Only applies when `q` is not provided.
           required: false
           schema:
@@ -320,7 +334,8 @@ paths:
           example: 2024-12-31
         - name: with_genres
           in: query
-          description: Comma-separated list of TMDB genre IDs to filter by. Only applies
+          description:
+            Comma-separated list of TMDB genre IDs to filter by. Only applies
             when `q` is not provided.
           required: false
           schema:
@@ -328,7 +343,8 @@ paths:
           example: 18,10765
         - name: with_runtime_gte
           in: query
-          description: Filter by minimum episode runtime in minutes. Only applies when `q`
+          description:
+            Filter by minimum episode runtime in minutes. Only applies when `q`
             is not provided.
           required: false
           schema:
@@ -336,7 +352,8 @@ paths:
           example: 20
         - name: with_runtime_lte
           in: query
-          description: Filter by maximum episode runtime in minutes. Only applies when `q`
+          description:
+            Filter by maximum episode runtime in minutes. Only applies when `q`
             is not provided.
           required: false
           schema:
@@ -381,7 +398,8 @@ paths:
       parameters:
         - name: limit
           in: query
-          description: Maximum number of results to return. Must be a positive integer no
+          description:
+            Maximum number of results to return. Must be a positive integer no
             greater than 50.
           required: false
           schema:
@@ -1056,7 +1074,8 @@ paths:
       tags:
         - Reviews
       summary: Delete a review (Admin)
-      description: Deletes any review as an administrator. Requires the Admin role or
+      description:
+        Deletes any review as an administrator. Requires the Admin role or
         higher.
       security:
         - bearerAuth: []
@@ -1138,7 +1157,8 @@ paths:
       tags:
         - Issues
       summary: Submit a bug report
-      description: Accepts a visitor bug report and persists it as an issue. No auth
+      description:
+        Accepts a visitor bug report and persists it as an issue. No auth
         required.
       requestBody:
         required: true
@@ -1201,7 +1221,8 @@ paths:
           example: 20
         - name: status
           in: query
-          description: Comma-separated list of statuses to filter by. Allowed values —
+          description:
+            Comma-separated list of statuses to filter by. Allowed values —
             Open, InProgress, Resolved, Closed.
           required: false
           schema:
@@ -1521,7 +1542,8 @@ paths:
                     title: Fight Club
                     poster_path: /pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg
                     backdrop_path: /fCayJrkfRaCRCTh8GqN30f8oyQF.jpg
-                    overview: A ticking-time-bomb insomniac and a slippery soap salesman channel
+                    overview:
+                      A ticking-time-bomb insomniac and a slippery soap salesman channel
                       primal male aggression into a brawling underground club.
                     genres:
                       - id: 18
@@ -1561,7 +1583,8 @@ paths:
                     name: Breaking Bad
                     poster_path: /ggFHVNu6YYI5L9pCfOacjizRGt.jpg
                     backdrop_path: /tsRy63Mu5cu8etL1X7ZLyf7UP1M.jpg
-                    overview: When Walter White, a New Mexico chemistry teacher diagnosed with
+                    overview:
+                      When Walter White, a New Mexico chemistry teacher diagnosed with
                       cancer, turns to manufacturing methamphetamine to secure
                       his family's future.
                     genres:
@@ -1572,6 +1595,86 @@ paths:
                     first_air_date: 2008-01-20
         "500":
           description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /v1/people/search:
+    get:
+      tags:
+        - People
+      summary: Search media by cast member
+      description: >
+        Finds the top-matching person by name via TMDB, then returns all movies
+        and TV shows they appear in, enriched with community rating data.
+      parameters:
+        - name: name
+          in: query
+          description: The cast member's name to search for (e.g. "Ryan Gosling").
+          required: true
+          schema:
+            type: string
+          example: Ryan Gosling
+        - name: media_type
+          in: query
+          description: Filter results to a specific media type.
+          required: false
+          schema:
+            type: string
+            enum:
+              - movie
+              - tv
+              - all
+            default: all
+          example: movie
+        - name: limit
+          in: query
+          description: Maximum number of results to return.
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 20
+          example: 20
+      responses:
+        "200":
+          description:
+            A list of movies and/or TV shows the person appears in, enriched
+            with community data.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PersonCredit"
+              example:
+                - id: 1100782
+                  title: The Fall Guy
+                  media_type: movie
+                  overview: A stuntman risks everything for his director.
+                  release_date: 2024-05-01
+                  poster_path: /tSz1qsmSJon0rqjHBxXZmrotuse.jpg
+                  character: Colt Seavers
+                  community_rating: 7.4
+                  community_rating_count: 12
+        "400":
+          description: Missing or invalid query parameters.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: name query parameter is required
+        "404":
+          description: No person found matching the given name.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: Person not found
+        "500":
+          description: Internal server error or TMDB API failure.
           content:
             application/json:
               schema:
@@ -1740,6 +1843,8 @@ components:
             backdrop_path:
               type: string
               nullable: true
+        community:
+          $ref: "#/components/schemas/CommunityData"
     TvSummary:
       type: object
       description: A condensed TV show object returned from list endpoints.
@@ -1929,6 +2034,52 @@ components:
               profile_path:
                 type: string
                 nullable: true
+        community:
+          $ref: "#/components/schemas/CommunityData"
+    CommunityData:
+      type: object
+      description: Community aggregate data embedded in movie and TV show detail responses.
+      properties:
+        averageRating:
+          type: number
+          format: float
+          nullable: true
+          description: Average star rating from community ratings. Null if no ratings exist.
+          example: 4.2
+        ratingCount:
+          type: integer
+          description: Total number of community ratings.
+          example: 89
+        reviewCount:
+          type: integer
+          description: Total number of community reviews.
+          example: 34
+        recentReviews:
+          type: array
+          description: Up to 3 most recent reviews.
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                example: 7
+              body:
+                type: string
+                example: A timeless classic.
+              createdAt:
+                type: string
+                format: date-time
+                example: 2024-11-01T09:23:00Z
+              author:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 5
+                  displayName:
+                    type: string
+                    description: Full name if available, otherwise username.
+                    example: Jane Doe
     Rating:
       type: object
       properties:
@@ -2093,7 +2244,8 @@ components:
           description: A detailed description of the problem.
         reproSteps:
           type: string
-          example: 1. Open /v1/movies 2. Set primary_release_date_gte=2020-01-01 3. Send
+          example:
+            1. Open /v1/movies 2. Set primary_release_date_gte=2020-01-01 3. Send
             request
           description: Optional reproduction steps or expected behavior.
         reporter:
@@ -2145,7 +2297,8 @@ components:
               type: string
               format: date-time
         tmdb:
-          description: TMDB metadata for the rated item. Null for books or if the item was
+          description:
+            TMDB metadata for the rated item. Null for books or if the item was
             removed from TMDB.
           nullable: true
           oneOf:
@@ -2168,7 +2321,8 @@ components:
           example: /fCayJrkfRaCRCTh8GqN30f8oyQF.jpg
         overview:
           type: string
-          example: A ticking-time-bomb insomniac and a slippery soap salesman channel
+          example:
+            A ticking-time-bomb insomniac and a slippery soap salesman channel
             primal male aggression into a brawling underground club.
         genres:
           type: array
@@ -2203,7 +2357,8 @@ components:
           example: /tsRy63Mu5cu8etL1X7ZLyf7UP1M.jpg
         overview:
           type: string
-          example: A chemistry teacher diagnosed with cancer turns to manufacturing drugs
+          example:
+            A chemistry teacher diagnosed with cancer turns to manufacturing drugs
             to secure his family's future.
         genres:
           type: array
@@ -2270,7 +2425,57 @@ components:
             - type: array
               items:
                 type: string
-          description: Additional context — either a plain string or a list of specific
+          description:
+            Additional context — either a plain string or a list of specific
             validation errors.
           example:
             - A title or description is required
+    PersonCredit:
+      type: object
+      description: A movie or TV show that a person appears in, enriched with
+        community rating data.
+      properties:
+        id:
+          type: integer
+          description: TMDB ID of the movie or TV show.
+          example: 1100782
+        title:
+          type: string
+          description: Title of the movie or TV show (uses `name` for TV shows internally).
+          example: The Fall Guy
+        media_type:
+          type: string
+          enum:
+            - movie
+            - tv
+          description: Whether this credit is a movie or TV show.
+          example: movie
+        overview:
+          type: string
+          description: Short plot summary from TMDB.
+          example: A stuntman risks everything for his director.
+        release_date:
+          type: string
+          format: date
+          nullable: true
+          description: Release date for movies, or first air date for TV shows.
+          example: 2024-05-01
+        poster_path:
+          type: string
+          nullable: true
+          description: TMDB poster image path.
+          example: /tSz1qsmSJon0rqjHBxXZmrotuse.jpg
+        character:
+          type: string
+          description: The role the person played in this title.
+          example: Colt Seavers
+        community_rating:
+          type: number
+          format: float
+          nullable: true
+          description: Average community score for this title. Null if no ratings exist.
+          example: 7.4
+        community_rating_count:
+          type: integer
+          description: Number of community ratings for this title.
+          example: 12

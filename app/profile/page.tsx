@@ -99,7 +99,7 @@ export default async function ProfilePage() {
   return (
     <div className="page-container">
       <div className="page-card">
-        <h1 className="section-title">Profile</h1>
+        <h1 className="section-title">{session.user?.name ?? "Profile"}</h1>
         <p className="section-subtitle">{session.user?.email}</p>
 
         <section className="page-section">

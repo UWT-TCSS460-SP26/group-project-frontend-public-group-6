@@ -463,10 +463,21 @@ details[open] .filters-summary::after {
   box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
+.search-form-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 560px;
+}
+
+.search-tabs {
+  display: flex;
+  gap: 8px;
+}
+
 .search-form {
   display: flex;
   gap: 12px;
-  max-width: 560px;
   flex-wrap: wrap;
 }
 
@@ -577,10 +588,16 @@ details[open] .filters-summary::after {
 }
 
 .media-card__title {
-  padding: 12px 14px;
+  padding: 12px 14px 4px;
   font-weight: 600;
   font-size: 0.95rem;
   color: var(--text);
+}
+
+.media-card__subtitle {
+  padding: 0 14px 12px;
+  font-size: 0.8rem;
+  color: var(--muted);
 }
 
 /* ─── Detail pages ─── */

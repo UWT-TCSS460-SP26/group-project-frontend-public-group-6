@@ -5,6 +5,12 @@ import RatingReviewSection from "@/app/components/RatingReviewSection";
 const API = process.env.NEXT_PUBLIC_API_BASE_URL!;
 const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 
+type CommunityData = {
+  averageRating: number | null;
+  ratingCount: number;
+  reviewCount: number;
+};
+
 type TvDetail = {
   name: string;
   tagline?: string | null;
@@ -16,18 +22,7 @@ type TvDetail = {
   number_of_episodes?: number;
   genres?: { id: number; name: string }[];
   poster_path: string | null;
-};
-
-type Rating = {
-  id: number;
-  userId: number;
-  mediaId: number;
-  mediaType: string;
-  score: number;
-  createdAt: string;
-  updatedAt: string;
-  reviewId: number | null;
-  author: { id: number; displayName: string };
+  community?: CommunityData;
 };
 
 type Review = {
@@ -49,9 +44,8 @@ export default async function TvDetailPage({
 }) {
   const { id } = await params;
 
-  const [tvRes, ratingsRes, reviewsRes, session] = await Promise.all([
+  const [tvRes, reviewsRes, session] = await Promise.all([
     fetch(`${API}/v1/tv/${id}`, { next: { revalidate: 3600 } }),
-    fetch(`${API}/v1/ratings/tv/${id}`),
     fetch(`${API}/v1/reviews/tv/${id}`),
     auth(),
   ]);
@@ -60,9 +54,11 @@ export default async function TvDetailPage({
   if (!tvRes.ok) throw new Error(`Failed to load TV show ${id}`);
 
   const show: TvDetail = await tvRes.json();
-  const ratings: Rating[] = ratingsRes.ok ? await ratingsRes.json() : [];
   const reviews: Review[] = reviewsRes.ok ? await reviewsRes.json() : [];
   const accessToken = session?.accessToken ?? null;
+
+  const communityRating = show.community?.averageRating ?? null;
+  const ratingCount = show.community?.ratingCount ?? 0;
 
   return (
     <div className="page-container">
@@ -124,9 +120,11 @@ export default async function TvDetailPage({
             <RatingReviewSection
               mediaType="tv"
               mediaId={Number(id)}
-              initialRatings={ratings}
+              communityRating={communityRating}
+              ratingCount={ratingCount}
               initialReviews={reviews}
-              accessToken={accessToken ?? null}
+              accessToken={accessToken}
+              userName={session?.user?.name ?? null}
             />
           </div>
         </div>

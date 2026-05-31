@@ -7,9 +7,10 @@ type Props = {
   title: string;
   posterPath: string | null;
   href: string;
+  subtitle?: string;
 };
 
-export default function MediaCard({ title, posterPath, href }: Props) {
+export default function MediaCard({ title, posterPath, href, subtitle }: Props) {
   return (
     <Link href={href} className="media-card">
       {posterPath ? (
@@ -23,6 +24,7 @@ export default function MediaCard({ title, posterPath, href }: Props) {
         </div>
       )}
       <div className="media-card__title">{title}</div>
+      {subtitle && <div className="media-card__subtitle">{subtitle}</div>}
     </Link>
   );
 }

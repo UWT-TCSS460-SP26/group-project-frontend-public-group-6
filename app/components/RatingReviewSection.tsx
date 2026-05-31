@@ -30,38 +30,40 @@ type Review = {
 type Props = {
   mediaType: "movie" | "tv";
   mediaId: number;
-  initialRatings: Rating[];
+  communityRating: number | null;
+  ratingCount: number;
   initialReviews: Review[];
   accessToken: string | null;
+  userName?: string | null;
 };
 
 export default function RatingReviewSection({
   mediaType,
   mediaId,
-  initialRatings,
+  communityRating,
+  ratingCount,
   initialReviews,
   accessToken,
+  userName,
 }: Props) {
-  const [ratings, setRatings] = useState<Rating[]>(initialRatings);
+  const [communityAvg, setCommunityAvg] = useState<number | null>(communityRating);
+  const [totalRatings, setTotalRatings] = useState(ratingCount);
   const [reviews, setReviews] = useState<Review[]>(initialReviews);
 
   const [myRating, setMyRating] = useState<Rating | null>(null);
   const [myReview, setMyReview] = useState<Review | null>(null);
 
-  // New submission form
   const [selectedScore, setSelectedScore] = useState<number | null>(null);
   const [reviewBody, setReviewBody] = useState("");
   const [submitLoading, setSubmitLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  // Edit mode (single form for both)
   const [editMode, setEditMode] = useState(false);
   const [editScore, setEditScore] = useState<number | null>(null);
   const [editBody, setEditBody] = useState("");
   const [editLoading, setEditLoading] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
 
-  // Delete (inline, no dialog)
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
@@ -88,11 +90,6 @@ export default function RatingReviewSection({
       .catch(() => {});
   }, [accessToken, mediaId, mediaType]);
 
-  const avg =
-    ratings.length > 0
-      ? ratings.reduce((s, r) => s + r.score, 0) / ratings.length
-      : null;
-
   // ── New submission ────────────────────────────────────────────────────────
 
   const canSubmit = selectedScore !== null || reviewBody.trim().length > 0;
@@ -118,7 +115,10 @@ export default function RatingReviewSection({
         }
         const created: Rating = await res.json();
         setMyRating(created);
-        setRatings((prev) => [...prev, created]);
+        const newCount = totalRatings + 1;
+        const newAvg = ((communityAvg ?? 0) * totalRatings + created.score) / newCount;
+        setTotalRatings(newCount);
+        setCommunityAvg(newAvg);
         setSelectedScore(null);
       }
       if (reviewBody.trim() && !myReview) {
@@ -163,6 +163,7 @@ export default function RatingReviewSection({
     setEditError(null);
     try {
       if (myRating && editScore !== null) {
+        const oldScore = myRating.score;
         const res = await fetch(`${API}/v1/ratings/${myRating.id}`, {
           method: "PUT",
           headers: {
@@ -177,13 +178,22 @@ export default function RatingReviewSection({
             setEditError(d.error ?? "Failed to update rating");
             return;
           }
-          // 404: rating already gone, clear it and continue
-          setRatings((prev) => prev.filter((r) => r.id !== myRating.id));
+          // 404: rating was already gone
+          const newCount = Math.max(0, totalRatings - 1);
+          if (newCount === 0) {
+            setCommunityAvg(null);
+            setTotalRatings(0);
+          } else {
+            setCommunityAvg(((communityAvg ?? 0) * totalRatings - oldScore) / newCount);
+            setTotalRatings(newCount);
+          }
           setMyRating(null);
         } else {
           const updated: Rating = await res.json();
+          if (communityAvg !== null && totalRatings > 0) {
+            setCommunityAvg(communityAvg + (updated.score - oldScore) / totalRatings);
+          }
           setMyRating(updated);
-          setRatings((prev) => prev.map((r) => (r.id === updated.id ? updated : r)));
         }
       }
       if (myReview) {
@@ -201,7 +211,6 @@ export default function RatingReviewSection({
             setEditError(d.error ?? "Failed to update review");
             return;
           }
-          // 404: review was deleted when rating was deleted (partner bug) — clear it
           setReviews((prev) => prev.filter((r) => r.id !== myReview.id));
           setMyReview(null);
         } else {
@@ -216,13 +225,14 @@ export default function RatingReviewSection({
     }
   }
 
-  // ── Delete (per-item) ─────────────────────────────────────────────────────
+  // ── Delete ────────────────────────────────────────────────────────────────
 
   async function deleteRating() {
     if (!accessToken || !myRating) return;
     setDeleteLoading(true);
     setDeleteError(null);
     try {
+      const oldScore = myRating.score;
       const res = await fetch(`${API}/v1/ratings/${myRating.id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${accessToken}` },
@@ -232,7 +242,14 @@ export default function RatingReviewSection({
         setDeleteError(d.error ?? "Failed to delete rating");
         return;
       }
-      setRatings((prev) => prev.filter((r) => r.id !== myRating.id));
+      const newCount = Math.max(0, totalRatings - 1);
+      if (newCount === 0) {
+        setCommunityAvg(null);
+        setTotalRatings(0);
+      } else {
+        setCommunityAvg(((communityAvg ?? 0) * totalRatings - oldScore) / newCount);
+        setTotalRatings(newCount);
+      }
       setMyRating(null);
       if (!myReview) setEditMode(false);
     } finally {
@@ -270,14 +287,14 @@ export default function RatingReviewSection({
       {/* ── Community aggregate ─────────────────────────────────────── */}
       <div className="rr-aggregate">
         <h2 className="section-heading">Ratings &amp; Reviews</h2>
-        {avg ? (
+        {communityAvg !== null ? (
           <div className="community-stat">
-            <StarRating value={avg} readonly size={22} />
+            <StarRating value={communityAvg} readonly size={22} />
             <span className="community-stat__text">
-              <strong>{(avg / 2).toFixed(1)}</strong>
+              <strong>{(communityAvg / 2).toFixed(1)}</strong>
               <span className="community-count">
-                / 5 &nbsp;({ratings.length}{" "}
-                {ratings.length === 1 ? "rating" : "ratings"})
+                / 5 &nbsp;({totalRatings}{" "}
+                {totalRatings === 1 ? "rating" : "ratings"})
               </span>
             </span>
           </div>
@@ -294,7 +311,7 @@ export default function RatingReviewSection({
           Sign in to rate or review
         </Link>
       ) : editMode ? (
-        /* ── Edit form (delete buttons visible here) ────────────────── */
+        /* ── Edit form ──────────────────────────────────────────────── */
         <div className="rr-contribution">
           {myRating && (
             <div className="edit-row">
@@ -357,10 +374,13 @@ export default function RatingReviewSection({
         </div>
       ) : (
         <>
-          {/* ── Submitted card (Edit button top-right, no delete) ────── */}
+          {/* ── Submitted card ───────────────────────────────────────── */}
           {hasContribution && (
             <div className="contribution-card">
               <div className="contribution-card__header">
+                <span className="review-card__author">
+                  {userName ?? "You"}
+                </span>
                 <button className="btn btn-secondary btn-sm" onClick={openEdit}>
                   Edit
                 </button>

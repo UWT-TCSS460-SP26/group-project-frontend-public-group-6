@@ -6,6 +6,7 @@ import ProfileRatingsList, {
 import ProfileReviewsList, {
   type ProfileReview,
 } from "@/app/components/ProfileReviewsList";
+import EditProfileForm from "@/app/components/EditProfileForm";
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL!;
 
@@ -33,7 +34,6 @@ async function fetchTmdb(
   mediaId: number
 ): Promise<TmdbMeta | null> {
   if (mediaType !== "movie" && mediaType !== "tv") return null;
-  // mediaType is "movie" or "tv" but API paths are "movies" and "tv"
   const path = mediaType === "movie" ? "movies" : "tv";
   try {
     const res = await fetch(`${API}/v1/${path}/${mediaId}`, {
@@ -68,6 +68,18 @@ export default async function ProfilePage() {
   const ratingsRaw: RatingRaw[] = ratingsRes.ok ? await ratingsRes.json() : [];
   const reviewsRaw: ReviewRaw[] = reviewsRes.ok ? await reviewsRes.json() : [];
 
+  // Earliest activity date used as "Member since" proxy
+  const allDates = [
+    ...ratingsRaw.map((r) => r.createdAt),
+    ...reviewsRaw.map((r) => r.createdAt),
+  ];
+  const memberSince =
+    allDates.length > 0
+      ? new Date(
+          Math.min(...allDates.map((d) => new Date(d).getTime()))
+        ).toLocaleDateString("en-US", { year: "numeric", month: "long" })
+      : null;
+
   // Deduplicate media items and fetch TMDB metadata in parallel
   const mediaKeys = [
     ...new Map(
@@ -99,8 +111,19 @@ export default async function ProfilePage() {
   return (
     <div className="page-container">
       <div className="page-card">
-        <h1 className="section-title">{session.user?.name ?? "Profile"}</h1>
-        <p className="section-subtitle">{session.user?.email}</p>
+        <div className="profile-header">
+          <div className="profile-header__info">
+            <h1 className="section-title">{session.user?.name ?? "Profile"}</h1>
+            <p className="profile-meta-item">{session.user?.email}</p>
+            {memberSince && (
+              <p className="profile-meta-item">Member since {memberSince}</p>
+            )}
+          </div>
+          <EditProfileForm
+            currentName={session.user?.name ?? ""}
+            accessToken={accessToken}
+          />
+        </div>
 
         <section className="page-section">
           <div className="profile-section-header">

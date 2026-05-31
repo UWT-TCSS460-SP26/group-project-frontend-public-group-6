@@ -25,7 +25,7 @@ export default async function Header() {
         {session?.user ? (
           <>
             <Link href="/profile" className="nav-link">
-              {session.user.email}
+              {session.user.name ?? session.user.email}
             </Link>
             <form
               action={async () => {

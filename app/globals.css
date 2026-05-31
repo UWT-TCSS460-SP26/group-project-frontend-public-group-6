@@ -1007,6 +1007,45 @@ details[open] .filters-summary::after {
   margin-top: 16px;
 }
 
+.profile-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.profile-header__info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.profile-header__info .section-title {
+  margin-bottom: 0;
+}
+
+.profile-meta-item {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.edit-profile-wrapper {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.edit-profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 220px;
+}
+
 .profile-section-header {
   display: flex;
   align-items: center;

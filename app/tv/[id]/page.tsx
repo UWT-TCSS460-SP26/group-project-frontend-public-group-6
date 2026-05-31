@@ -25,6 +25,8 @@ type TvDetail = {
   community?: CommunityData;
 };
 
+type Rating = { id: number; score: number };
+
 type Review = {
   id: number;
   userId: number;
@@ -44,8 +46,9 @@ export default async function TvDetailPage({
 }) {
   const { id } = await params;
 
-  const [tvRes, reviewsRes, session] = await Promise.all([
+  const [tvRes, ratingsRes, reviewsRes, session] = await Promise.all([
     fetch(`${API}/v1/tv/${id}`, { next: { revalidate: 3600 } }),
+    fetch(`${API}/v1/ratings/tv/${id}`),
     fetch(`${API}/v1/reviews/tv/${id}`),
     auth(),
   ]);
@@ -54,11 +57,15 @@ export default async function TvDetailPage({
   if (!tvRes.ok) throw new Error(`Failed to load TV show ${id}`);
 
   const show: TvDetail = await tvRes.json();
+  const ratingsRaw: Rating[] = ratingsRes.ok ? await ratingsRes.json() : [];
   const reviews: Review[] = reviewsRes.ok ? await reviewsRes.json() : [];
   const accessToken = session?.accessToken ?? null;
 
   const communityRating = show.community?.averageRating ?? null;
-  const ratingCount = show.community?.ratingCount ?? 0;
+  const ratingCount = show.community?.ratingCount ?? ratingsRaw.length;
+  const ratingScores: Record<number, number> = Object.fromEntries(
+    ratingsRaw.map((r) => [r.id, r.score])
+  );
 
   return (
     <div className="page-container">
@@ -123,6 +130,7 @@ export default async function TvDetailPage({
               communityRating={communityRating}
               ratingCount={ratingCount}
               initialReviews={reviews}
+              ratingScores={ratingScores}
               accessToken={accessToken}
               userName={session?.user?.name ?? null}
             />

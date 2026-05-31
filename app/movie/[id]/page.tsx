@@ -23,6 +23,8 @@ type MovieDetail = {
   community?: CommunityData;
 };
 
+type Rating = { id: number; score: number };
+
 type Review = {
   id: number;
   userId: number;
@@ -42,8 +44,9 @@ export default async function MovieDetailPage({
 }) {
   const { id } = await params;
 
-  const [movieRes, reviewsRes, session] = await Promise.all([
+  const [movieRes, ratingsRes, reviewsRes, session] = await Promise.all([
     fetch(`${API}/v1/movies/${id}`, { next: { revalidate: 3600 } }),
+    fetch(`${API}/v1/ratings/movie/${id}`),
     fetch(`${API}/v1/reviews/movie/${id}`),
     auth(),
   ]);
@@ -52,11 +55,15 @@ export default async function MovieDetailPage({
   if (!movieRes.ok) throw new Error(`Failed to load movie ${id}`);
 
   const movie: MovieDetail = await movieRes.json();
+  const ratingsRaw: Rating[] = ratingsRes.ok ? await ratingsRes.json() : [];
   const reviews: Review[] = reviewsRes.ok ? await reviewsRes.json() : [];
   const accessToken = session?.accessToken ?? null;
 
   const communityRating = movie.community?.averageRating ?? null;
-  const ratingCount = movie.community?.ratingCount ?? 0;
+  const ratingCount = movie.community?.ratingCount ?? ratingsRaw.length;
+  const ratingScores: Record<number, number> = Object.fromEntries(
+    ratingsRaw.map((r) => [r.id, r.score])
+  );
 
   return (
     <div className="page-container">
@@ -109,6 +116,7 @@ export default async function MovieDetailPage({
               communityRating={communityRating}
               ratingCount={ratingCount}
               initialReviews={reviews}
+              ratingScores={ratingScores}
               accessToken={accessToken}
               userName={session?.user?.name ?? null}
             />

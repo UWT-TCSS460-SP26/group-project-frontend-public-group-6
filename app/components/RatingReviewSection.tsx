@@ -33,6 +33,7 @@ type Props = {
   communityRating: number | null;
   ratingCount: number;
   initialReviews: Review[];
+  ratingScores?: Record<number, number>;
   accessToken: string | null;
   userName?: string | null;
 };
@@ -43,6 +44,7 @@ export default function RatingReviewSection({
   communityRating,
   ratingCount,
   initialReviews,
+  ratingScores,
   accessToken,
   userName,
 }: Props) {
@@ -376,23 +378,22 @@ export default function RatingReviewSection({
         <>
           {/* ── Submitted card ───────────────────────────────────────── */}
           {hasContribution && (
-            <div className="contribution-card">
-              <div className="contribution-card__header">
-                <span className="review-card__author">
-                  {userName ?? "You"}
-                </span>
-                <button className="btn btn-secondary btn-sm" onClick={openEdit}>
-                  Edit
-                </button>
+            <div className="review-card review-card--mine">
+              <div className="review-card__header">
+                <span className="review-card__author">{userName ?? "You"}</span>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <span className="review-card__date">
+                    {new Date(
+                      (myReview?.createdAt ?? myRating?.createdAt)!
+                    ).toLocaleDateString()}
+                  </span>
+                  <button className="btn btn-secondary btn-sm" onClick={openEdit}>
+                    Edit
+                  </button>
+                </div>
               </div>
-              <div className="contribution-card__body">
-                {myRating && (
-                  <StarRating value={myRating.score} readonly size={22} />
-                )}
-                {myReview && (
-                  <p className="contribution-review-body">{myReview.body}</p>
-                )}
-              </div>
+              {myRating && <StarRating value={myRating.score} readonly size={16} />}
+              {myReview && <p className="review-card__body">{myReview.body}</p>}
             </div>
           )}
 
@@ -461,19 +462,26 @@ export default function RatingReviewSection({
       {communityReviews.length > 0 && (
         <div className="review-list">
           <h3 className="review-list__heading">Community Reviews</h3>
-          {communityReviews.map((review) => (
-            <div key={review.id} className="review-card">
-              <div className="review-card__header">
-                <span className="review-card__author">
-                  {review.author?.displayName ?? "Anonymous"}
-                </span>
-                <span className="review-card__date">
-                  {new Date(review.createdAt).toLocaleDateString()}
-                </span>
+          {communityReviews.map((review) => {
+            const score =
+              review.ratingId != null ? ratingScores?.[review.ratingId] : undefined;
+            return (
+              <div key={review.id} className="review-card">
+                <div className="review-card__header">
+                  <span className="review-card__author">
+                    {review.author?.displayName ?? "Anonymous"}
+                  </span>
+                  <span className="review-card__date">
+                    {new Date(review.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+                {score != null && (
+                  <StarRating value={score} readonly size={16} />
+                )}
+                <p className="review-card__body">{review.body}</p>
               </div>
-              <p className="review-card__body">{review.body}</p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 

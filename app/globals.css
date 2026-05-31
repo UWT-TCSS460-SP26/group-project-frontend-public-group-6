@@ -738,34 +738,6 @@ details[open] .filters-summary::after {
   margin-bottom: 24px;
 }
 
-.contribution-card {
-  border-radius: 14px;
-  background: var(--surface-strong);
-  border: 1px solid var(--border);
-  margin-bottom: 8px;
-  overflow: hidden;
-}
-
-.contribution-card__header {
-  display: flex;
-  justify-content: flex-end;
-  padding: 10px 14px 0;
-}
-
-.contribution-card__body {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 10px 18px 16px;
-}
-
-.contribution-review-body {
-  color: var(--text);
-  line-height: 1.7;
-  margin: 0;
-  font-size: 0.95rem;
-  word-break: break-word;
-}
 
 /* ─── Edit-mode rows (field + delete button side by side) ─── */
 .edit-row {

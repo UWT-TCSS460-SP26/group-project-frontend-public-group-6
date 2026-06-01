@@ -34,7 +34,7 @@ export default function RootLayout({
       </head>
 
       <body className={`${cinzel.variable} ${playfair.variable} app-shell`}>
-        {/* Ambient projector glow */}
+        {/* Subtle ambient glow — refined projector effect */}
         <div className="projector-light" />
 
         {/* Sidebar navigation */}
@@ -43,18 +43,13 @@ export default function RootLayout({
         {/* Main content */}
         <main>{children}</main>
 
-        {/* Footer */}
+        {/* Footer — slim Lumière branding only */}
         <footer className="palace-footer">
           <div className="palace-footer__inner">
-            <div className="palace-footer__bulbs" aria-hidden="true">
-              {Array.from({ length: 20 }).map((_, i) => (
-                <span key={i} className={`footer-bulb footer-bulb-${(i % 4) + 1}`} />
-              ))}
-            </div>
             <p className="palace-footer__text">
-              <span className="palace-footer__logo">✦ &nbsp; LUMIÈRE &nbsp; ✦</span>
+              <span className="palace-footer__logo">✦ LUMIÈRE ✦</span>
               <span className="palace-footer__sub">
-                Established MCMLI · Cinema &amp; Television Emporium
+                Established MCMLI · Cinema &amp; Television
               </span>
             </p>
           </div>

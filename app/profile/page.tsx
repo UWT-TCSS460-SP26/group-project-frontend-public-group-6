@@ -1,11 +1,6 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
-import ProfileRatingsList, {
-  type ProfileRating,
-} from "@/app/components/ProfileRatingsList";
-import ProfileReviewsList, {
-  type ProfileReview,
-} from "@/app/components/ProfileReviewsList";
+import ProfileClient from "./ProfileClient";
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL!;
 
@@ -33,7 +28,6 @@ async function fetchTmdb(
   mediaId: number
 ): Promise<TmdbMeta | null> {
   if (mediaType !== "movie" && mediaType !== "tv") return null;
-  // mediaType is "movie" or "tv" but API paths are "movies" and "tv"
   const path = mediaType === "movie" ? "movies" : "tv";
   try {
     const res = await fetch(`${API}/v1/${path}/${mediaId}`, {
@@ -55,6 +49,7 @@ export default async function ProfilePage() {
   if (!session) redirect("/api/auth/signin");
 
   const accessToken = session.accessToken ?? "";
+  const userEmail = session.user?.email ?? "";
 
   const [ratingsRes, reviewsRes] = await Promise.all([
     fetch(`${API}/v1/ratings/me`, {
@@ -68,7 +63,7 @@ export default async function ProfilePage() {
   const ratingsRaw: RatingRaw[] = ratingsRes.ok ? await ratingsRes.json() : [];
   const reviewsRaw: ReviewRaw[] = reviewsRes.ok ? await reviewsRes.json() : [];
 
-  // Deduplicate media items and fetch TMDB metadata in parallel
+  // Deduplicate media keys, fetch TMDB metadata in parallel
   const mediaKeys = [
     ...new Map(
       [...ratingsRaw, ...reviewsRaw].map((r) => [
@@ -86,48 +81,22 @@ export default async function ProfilePage() {
   );
   const tmdbMap = new Map(tmdbEntries);
 
-  const ratings: ProfileRating[] = ratingsRaw.map((r) => ({
+  const ratings = ratingsRaw.map((r) => ({
     ...r,
     tmdb: tmdbMap.get(`${r.mediaType}:${r.mediaId}`) ?? null,
   }));
 
-  const reviews: ProfileReview[] = reviewsRaw.map((r) => ({
+  const reviews = reviewsRaw.map((r) => ({
     ...r,
     tmdb: tmdbMap.get(`${r.mediaType}:${r.mediaId}`) ?? null,
   }));
 
   return (
-    <div className="page-container">
-      <div className="page-card">
-        <h1 className="section-title">Profile</h1>
-        <p className="section-subtitle">{session.user?.email}</p>
-
-        <section className="page-section">
-          <div className="profile-section-header">
-            <h2 className="section-heading">Your Ratings</h2>
-            {ratings.length > 0 && (
-              <span className="profile-count">{ratings.length}</span>
-            )}
-          </div>
-          <ProfileRatingsList
-            initialRatings={ratings}
-            accessToken={accessToken}
-          />
-        </section>
-
-        <section className="page-section">
-          <div className="profile-section-header">
-            <h2 className="section-heading">Your Reviews</h2>
-            {reviews.length > 0 && (
-              <span className="profile-count">{reviews.length}</span>
-            )}
-          </div>
-          <ProfileReviewsList
-            initialReviews={reviews}
-            accessToken={accessToken}
-          />
-        </section>
-      </div>
-    </div>
+    <ProfileClient
+      userEmail={userEmail}
+      accessToken={accessToken}
+      initialRatings={ratings}
+      initialReviews={reviews}
+    />
   );
 }

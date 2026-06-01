@@ -1,5 +1,4 @@
 import Link from "next/link";
-import ThemeToggle from "@/components/ThemeToggle";
 import NavLink from "@/components/NavLink";
 import { auth, signIn, signOut } from "@/auth";
 
@@ -66,8 +65,6 @@ export default async function Header() {
       </nav>
 
       <div className="nav-actions">
-        <ThemeToggle />
-
         {session?.user ? (
           <>
             <span className="nav-user-email">{session.user.email}</span>

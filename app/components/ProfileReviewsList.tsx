@@ -19,7 +19,10 @@ export type ProfileReview = {
 
 type Props = { initialReviews: ProfileReview[]; accessToken: string };
 
-export default function ProfileReviewsList({ initialReviews, accessToken }: Props) {
+export default function ProfileReviewsList({
+  initialReviews,
+  accessToken,
+}: Props) {
   const [reviews, setReviews] = useState<ProfileReview[]>(initialReviews);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editBody, setEditBody] = useState("");
@@ -47,8 +50,10 @@ export default function ProfileReviewsList({ initialReviews, accessToken }: Prop
       const updated = await res.json();
       setReviews((prev) =>
         prev.map((r) =>
-          r.id === updated.id ? { ...r, body: updated.body, updatedAt: updated.updatedAt } : r
-        )
+          r.id === updated.id
+            ? { ...r, body: updated.body, updatedAt: updated.updatedAt }
+            : r,
+        ),
       );
       setEditingId(null);
     } finally {
@@ -105,7 +110,10 @@ export default function ProfileReviewsList({ initialReviews, accessToken }: Prop
 
             {editingId === review.id ? (
               <div className="profile-item__edit">
-                <label htmlFor={`edit-review-${review.id}`} className="form-label">
+                <label
+                  htmlFor={`edit-review-${review.id}`}
+                  className="form-label"
+                >
                   Edit review
                 </label>
                 <textarea
@@ -116,7 +124,10 @@ export default function ProfileReviewsList({ initialReviews, accessToken }: Prop
                   rows={3}
                   disabled={loading}
                 />
-                <div className="contribution-actions" style={{ marginTop: "10px" }}>
+                <div
+                  className="contribution-actions"
+                  style={{ marginTop: "10px" }}
+                >
                   <button
                     className="btn btn-primary btn-sm"
                     onClick={() => saveEdit(review.id)}

@@ -5,6 +5,12 @@ import RatingReviewSection from "@/app/components/RatingReviewSection";
 const API = process.env.NEXT_PUBLIC_API_BASE_URL!;
 const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 
+type CommunityData = {
+  averageRating: number | null;
+  ratingCount: number;
+  reviewCount: number;
+};
+
 type MovieDetail = {
   title: string;
   tagline?: string;
@@ -14,19 +20,10 @@ type MovieDetail = {
   status?: string;
   genres?: { id: number; name: string }[];
   poster_path: string | null;
+  community?: CommunityData;
 };
 
-type Rating = {
-  id: number;
-  userId: number;
-  mediaId: number;
-  mediaType: string;
-  score: number;
-  createdAt: string;
-  updatedAt: string;
-  reviewId: number | null;
-  author: { id: number; displayName: string };
-};
+type Rating = { id: number; score: number };
 
 type Review = {
   id: number;
@@ -58,9 +55,15 @@ export default async function MovieDetailPage({
   if (!movieRes.ok) throw new Error(`Failed to load movie ${id}`);
 
   const movie: MovieDetail = await movieRes.json();
-  const ratings: Rating[] = ratingsRes.ok ? await ratingsRes.json() : [];
+  const ratingsRaw: Rating[] = ratingsRes.ok ? await ratingsRes.json() : [];
   const reviews: Review[] = reviewsRes.ok ? await reviewsRes.json() : [];
   const accessToken = session?.accessToken ?? null;
+
+  const communityRating = movie.community?.averageRating ?? null;
+  const ratingCount = movie.community?.ratingCount ?? ratingsRaw.length;
+  const ratingScores: Record<number, number> = Object.fromEntries(
+    ratingsRaw.map((r) => [r.id, r.score])
+  );
 
   return (
     <div className="page-container">
@@ -110,9 +113,12 @@ export default async function MovieDetailPage({
             <RatingReviewSection
               mediaType="movie"
               mediaId={Number(id)}
-              initialRatings={ratings}
+              communityRating={communityRating}
+              ratingCount={ratingCount}
               initialReviews={reviews}
-              accessToken={accessToken ?? null}
+              ratingScores={ratingScores}
+              accessToken={accessToken}
+              userName={session?.user?.name ?? null}
             />
           </div>
         </div>

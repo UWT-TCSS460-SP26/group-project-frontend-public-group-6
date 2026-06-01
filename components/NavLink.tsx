@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-type Props = { href: string; icon: string; label: string };
+type Props = { href: string; icon: React.ReactNode; label: string };
 
 export default function NavLink({ href, icon, label }: Props) {
   const pathname = usePathname();

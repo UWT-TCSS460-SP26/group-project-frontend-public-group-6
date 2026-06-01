@@ -11,9 +11,10 @@ type Props = {
   isNew?: boolean;
   /** Optional: show a rating overlay */
   rating?: number;
+  subtitle?: string;
 };
 
-export default function MediaCard({ title, posterPath, href, isNew, rating }: Props) {
+export default function MediaCard({ title, posterPath, href, isNew, rating, subtitle }: Props) {
   return (
     <Link href={href} className="media-card">
       <div className="media-card__thumb">
@@ -88,6 +89,7 @@ export default function MediaCard({ title, posterPath, href, isNew, rating }: Pr
       </div>
 
       <div className="media-card__title">{title}</div>
+      {subtitle && <div className="media-card__subtitle">{subtitle}</div>}
     </Link>
   );
 }

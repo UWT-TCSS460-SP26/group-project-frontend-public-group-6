@@ -30,6 +30,17 @@ type ProfileReview = ReviewRaw & { tmdb: TmdbMeta | null };
 
 type Tab = "ratings" | "reviews";
 
+/* ── Profile SVG icons ── */
+function ProfileSvgIcon({ name }: { name: string }) {
+  const icons: Record<string, React.ReactNode> = {
+    ratings: <svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" style={{width:15,height:15,display:"inline-block",verticalAlign:"middle"}}><polygon points="9,1.5 11,6.5 16.5,7 12.5,10.5 13.8,16 9,13.2 4.2,16 5.5,10.5 1.5,7 7,6.5" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"/></svg>,
+    reviews: <svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" style={{width:15,height:15,display:"inline-block",verticalAlign:"middle"}}><rect x="2" y="2" width="14" height="14" rx="1.5" stroke="currentColor" strokeWidth="1.4"/><line x1="5" y1="6" x2="13" y2="6" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round"/><line x1="5" y1="9" x2="13" y2="9" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round"/><line x1="5" y1="12" x2="9" y2="12" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round"/></svg>,
+    film: <svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" style={{width:13,height:13,display:"inline-block",verticalAlign:"middle"}}><rect x="1" y="3" width="16" height="12" rx="1" stroke="currentColor" strokeWidth="1.3"/><polygon points="7,7 12,9 7,11" fill="currentColor"/></svg>,
+    tv: <svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" style={{width:13,height:13,display:"inline-block",verticalAlign:"middle"}}><rect x="1" y="3" width="12" height="9" rx="1" stroke="currentColor" strokeWidth="1.3"/><polyline points="13,5.5 17,4 17,10 13,8.5" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/><line x1="5" y1="14" x2="11" y2="14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
+  };
+  return <>{icons[name] ?? null}</>;
+}
+
 /* ── Star display ── */
 function Stars({ score }: { score: number }) {
   const filled = Math.round(score / 2);
@@ -181,7 +192,7 @@ function RatingItem({ rating }: { rating: ProfileRating }) {
         <a href={href} className="profile-item__title">{title}</a>
         <div className="profile-item__meta">
           <span className="profile-badge">
-            {rating.mediaType === "movie" ? "🎬 Film" : "📺 TV"}
+            {rating.mediaType === "movie" ? <><ProfileSvgIcon name="film" /> Film</> : <><ProfileSvgIcon name="tv" /> TV</>}
           </span>
           <Stars score={rating.score} />
         </div>
@@ -219,7 +230,7 @@ function ReviewItem({ review }: { review: ProfileReview }) {
         <a href={href} className="profile-item__title">{title}</a>
         <div className="profile-item__meta">
           <span className="profile-badge">
-            {review.mediaType === "movie" ? "🎬 Film" : "📺 TV"}
+            {review.mediaType === "movie" ? <><ProfileSvgIcon name="film" /> Film</> : <><ProfileSvgIcon name="tv" /> TV</>}
           </span>
           <span className="profile-item__date">
             {new Date(review.createdAt).toLocaleDateString("en-US", {
@@ -246,12 +257,23 @@ function ReviewItem({ review }: { review: ProfileReview }) {
   );
 }
 
-/* ── Empty state ── */
 function EmptyState({ tab }: { tab: Tab }) {
   return (
     <div className="profile-empty">
       <span className="profile-empty__icon">
-        {tab === "ratings" ? "⭐" : "✍️"}
+        {tab === "ratings" ? (
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style={{width:48,height:48}}>
+            <polygon points="24,4 29.5,17 44,18.5 33.5,28 37,42 24,34.5 11,42 14.5,28 4,18.5 18.5,17" stroke="currentColor" strokeWidth="2.5" strokeLinejoin="round"/>
+          </svg>
+        ) : (
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style={{width:48,height:48}}>
+            <rect x="6" y="6" width="36" height="36" rx="4" stroke="currentColor" strokeWidth="2.5"/>
+            <line x1="14" y1="18" x2="34" y2="18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            <line x1="14" y1="24" x2="34" y2="24" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            <line x1="14" y1="30" x2="24" y2="30" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            <path d="M28 31 L31 34 L37 27" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        )}
       </span>
       <p className="profile-empty__text">
         {tab === "ratings"
@@ -333,7 +355,8 @@ export default function ProfilePage({
             className={`profile-tab ${activeTab === "ratings" ? "active" : ""}`}
             onClick={() => setTab("ratings")}
           >
-            ⭐ Ratings
+            <ProfileSvgIcon name="ratings" />
+            Ratings
             {ratings.length > 0 && (
               <span className="tab-count">{ratings.length}</span>
             )}
@@ -344,7 +367,8 @@ export default function ProfilePage({
             className={`profile-tab ${activeTab === "reviews" ? "active" : ""}`}
             onClick={() => setTab("reviews")}
           >
-            ✍️ Reviews
+            <ProfileSvgIcon name="reviews" />
+            Reviews
             {reviews.length > 0 && (
               <span className="tab-count">{reviews.length}</span>
             )}

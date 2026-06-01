@@ -26,6 +26,8 @@ tags:
     description: Bug report submission (public) and issue management (Admin+).
   - name: Discovery
     description: Community-ranked discovery feeds. Public — no auth required.
+  - name: People
+    description: Search for media by cast member name.
 paths:
   /health:
     get:
@@ -1576,6 +1578,85 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /v1/people/search:
+    get:
+      tags:
+        - People
+      summary: Search media by cast member
+      description: >
+        Finds the top-matching person by name via TMDB, then returns all movies
+        and TV shows they appear in, enriched with community rating data.
+      parameters:
+        - name: name
+          in: query
+          description: The cast member's name to search for (e.g. "Ryan Gosling").
+          required: true
+          schema:
+            type: string
+          example: Ryan Gosling
+        - name: media_type
+          in: query
+          description: Filter results to a specific media type.
+          required: false
+          schema:
+            type: string
+            enum:
+              - movie
+              - tv
+              - all
+            default: all
+          example: movie
+        - name: limit
+          in: query
+          description: Maximum number of results to return.
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 20
+          example: 20
+      responses:
+        "200":
+          description: A list of movies and/or TV shows the person appears in, enriched
+            with community data.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PersonCredit"
+              example:
+                - id: 1100782
+                  title: The Fall Guy
+                  media_type: movie
+                  overview: A stuntman risks everything for his director.
+                  release_date: 2024-05-01
+                  poster_path: /tSz1qsmSJon0rqjHBxXZmrotuse.jpg
+                  character: Colt Seavers
+                  community_rating: 7.4
+                  community_rating_count: 12
+        "400":
+          description: Missing or invalid query parameters.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: name query parameter is required
+        "404":
+          description: No person found matching the given name.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error: Person not found
+        "500":
+          description: Internal server error or TMDB API failure.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 components:
   securitySchemes:
     bearerAuth:
@@ -1740,6 +1821,8 @@ components:
             backdrop_path:
               type: string
               nullable: true
+        community:
+          $ref: "#/components/schemas/CommunityData"
     TvSummary:
       type: object
       description: A condensed TV show object returned from list endpoints.
@@ -1929,6 +2012,52 @@ components:
               profile_path:
                 type: string
                 nullable: true
+        community:
+          $ref: "#/components/schemas/CommunityData"
+    CommunityData:
+      type: object
+      description: Community aggregate data embedded in movie and TV show detail responses.
+      properties:
+        averageRating:
+          type: number
+          format: float
+          nullable: true
+          description: Average star rating from community ratings. Null if no ratings exist.
+          example: 4.2
+        ratingCount:
+          type: integer
+          description: Total number of community ratings.
+          example: 89
+        reviewCount:
+          type: integer
+          description: Total number of community reviews.
+          example: 34
+        recentReviews:
+          type: array
+          description: Up to 3 most recent reviews.
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                example: 7
+              body:
+                type: string
+                example: A timeless classic.
+              createdAt:
+                type: string
+                format: date-time
+                example: 2024-11-01T09:23:00Z
+              author:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 5
+                  displayName:
+                    type: string
+                    description: Full name if available, otherwise username.
+                    example: Jane Doe
     Rating:
       type: object
       properties:
@@ -2274,3 +2403,52 @@ components:
             validation errors.
           example:
             - A title or description is required
+    PersonCredit:
+      type: object
+      description: A movie or TV show that a person appears in, enriched with
+        community rating data.
+      properties:
+        id:
+          type: integer
+          description: TMDB ID of the movie or TV show.
+          example: 1100782
+        title:
+          type: string
+          description: Title of the movie or TV show (uses `name` for TV shows internally).
+          example: The Fall Guy
+        media_type:
+          type: string
+          enum:
+            - movie
+            - tv
+          description: Whether this credit is a movie or TV show.
+          example: movie
+        overview:
+          type: string
+          description: Short plot summary from TMDB.
+          example: A stuntman risks everything for his director.
+        release_date:
+          type: string
+          format: date
+          nullable: true
+          description: Release date for movies, or first air date for TV shows.
+          example: 2024-05-01
+        poster_path:
+          type: string
+          nullable: true
+          description: TMDB poster image path.
+          example: /tSz1qsmSJon0rqjHBxXZmrotuse.jpg
+        character:
+          type: string
+          description: The role the person played in this title.
+          example: Colt Seavers
+        community_rating:
+          type: number
+          format: float
+          nullable: true
+          description: Average community score for this title. Null if no ratings exist.
+          example: 7.4
+        community_rating_count:
+          type: integer
+          description: Number of community ratings for this title.
+          example: 12

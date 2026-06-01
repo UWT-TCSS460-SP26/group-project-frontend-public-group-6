@@ -1,5 +1,18 @@
 import Link from "next/link";
 
+const GENRES = [
+  { icon: "🔫", label: "Action",      href: "/browse?genre=Action",      id: "28" },
+  { icon: "🎭", label: "Drama",       href: "/browse?genre=Drama",       id: "18" },
+  { icon: "🔪", label: "Thriller",    href: "/browse?genre=Thriller",    id: "53" },
+  { icon: "💕", label: "Romance",     href: "/browse?genre=Romance",     id: "10749" },
+  { icon: "😂", label: "Comedy",      href: "/browse?genre=Comedy",      id: "35" },
+  { icon: "🚀", label: "Sci-Fi",      href: "/browse?genre=Sci-Fi",      id: "878" },
+  { icon: "🎥", label: "Documentary", href: "/browse?genre=Documentary", id: "99" },
+  { icon: "✨", label: "Animation",   href: "/browse?genre=Animation",   id: "16" },
+  { icon: "😱", label: "Horror",      href: "/browse?genre=Horror",      id: "27" },
+  { icon: "🕵️", label: "Mystery",     href: "/browse?genre=Mystery",     id: "9648" },
+];
+
 export default function Home() {
   return (
     <div className="page-container">
@@ -13,7 +26,7 @@ export default function Home() {
               <span className="ticker-star">✦</span> COMING SOON &nbsp;
               <span className="ticker-star">★</span> TWO FEATURES NIGHTLY &nbsp;
               <span className="ticker-star">✦</span> DOORS OPEN AT SEVEN &nbsp;
-              <span className="ticker-star">★</span> POPCORN &amp; CANDY AT THE LOBBY &nbsp;
+              <span className="ticker-star">★</span> 10,000+ TITLES &nbsp;
               <span className="ticker-star">✦</span> RESERVE YOUR SEATS &nbsp;
             </span>
           ))}
@@ -22,88 +35,44 @@ export default function Home() {
 
       {/* ── Hero ── */}
       <section className="hero" aria-label="Welcome">
+        <div className="hero-spotlight" aria-hidden="true" />
+        <div className="hero-orb hero-orb-1" aria-hidden="true" />
+        <div className="hero-orb hero-orb-2" aria-hidden="true" />
+        <div className="hero-corner-tl" aria-hidden="true" />
+        <div className="hero-corner-br" aria-hidden="true" />
+        <div className="hero-stripe" aria-hidden="true" />
 
-        {/* Corner ornaments */}
-        <div className="hero-corners" aria-hidden="true" />
-
-        {/* Top marquee bulb row */}
-        <div className="marquee-row marquee-row--top" aria-hidden="true">
-          {Array.from({ length: 26 }).map((_, i) => (
-            <span key={i} className={`bulb bulb-${(i % 5) + 1}`} />
-          ))}
-        </div>
-
-        {/* Bottom marquee bulb row */}
-        <div className="marquee-row marquee-row--bottom" aria-hidden="true">
-          {Array.from({ length: 26 }).map((_, i) => (
-            <span key={i} className={`bulb bulb-${((i + 2) % 5) + 1}`} />
-          ))}
-        </div>
-
-        {/* Left marquee column */}
-        <div className="marquee-col marquee-col--left" aria-hidden="true">
-          {Array.from({ length: 14 }).map((_, i) => (
-            <span key={i} className={`bulb bulb-${((i + 1) % 5) + 1}`} />
-          ))}
-        </div>
-
-        {/* Right marquee column */}
-        <div className="marquee-col marquee-col--right" aria-hidden="true">
-          {Array.from({ length: 14 }).map((_, i) => (
-            <span key={i} className={`bulb bulb-${((i + 3) % 5) + 1}`} />
-          ))}
-        </div>
-
-        {/* Inner decorative border */}
-        <div className="hero-inner-frame" aria-hidden="true" />
-
-        {/* Stage curtains */}
-        <div className="curtain curtain--left"  aria-hidden="true" />
-        <div className="curtain curtain--right" aria-hidden="true" />
-
-        {/* ── Content ── */}
         <div className="hero-body">
           <div className="hero-badge">
-            <span className="hero-badge__star">★</span>
             <span className="hero-badge__text">Grand Opening Season</span>
-            <span className="hero-badge__star">★</span>
           </div>
 
+          <p className="hero-welcome">Welcome to</p>
+
           <div className="hero-title-block">
-            <div className="hero-title-ornament" aria-hidden="true">— ✦ —</div>
             <h1 className="hero-title">
-              The&nbsp;Grand&nbsp;<span className="hero-title-accent">Palace</span>
+              Lumière
             </h1>
-            <div className="hero-title-sub">Picture House &amp; Television Emporium</div>
-            <div className="hero-title-ornament" aria-hidden="true">— ✦ —</div>
+            <div className="hero-title-sub">Where Stories Come to Life</div>
           </div>
 
           <p className="hero-copy">
             Step inside the most magnificent hall of moving pictures ever conceived.
-            Discover the finest films, the most thrilling serials, and television
-            programmes of extraordinary distinction — all presented with the elegance
-            this great Palace demands.
+            Discover the finest films, thrilling serials, and television programmes
+            of extraordinary distinction.
           </p>
-
-          <div className="hero-divider" aria-hidden="true">
-            <span className="divider-line" />
-            <span className="divider-icon">🎬</span>
-            <span className="divider-line" />
-          </div>
 
           <div className="hero-actions">
             <Link href="/browse" className="btn btn-primary btn-marquee">
-              <span className="btn-icon">🎭</span>
+              <span className="btn-icon">▶</span>
               Now Showing
               <span className="btn-shine" aria-hidden="true" />
             </Link>
-            <Link href="/search" className="btn btn-secondary btn-vintage">
-              <span className="btn-icon">🔍</span>
-              Search the Catalogue
+            <Link href="/browse" className="btn btn-secondary btn-vintage">
+              Browse All
             </Link>
           </div>
 
-          {/* Feature badges */}
           <div className="hero-features">
             <span className="feature-badge">
               <span className="feature-badge__icon">🎞</span> 10,000+ Titles
@@ -118,12 +87,21 @@ export default function Home() {
             </span>
           </div>
         </div>
-
       </section>
 
-      {/* ── Now Playing marquee sign ── */}
+      {/* ── Genre chips ── */}
+      <div className="genre-chips-row" role="list" aria-label="Browse by genre">
+        {GENRES.map((g) => (
+          <Link key={g.label} href={g.href} className="genre-chip" role="listitem">
+            <span className="genre-chip__icon" aria-hidden="true">{g.icon}</span>
+            {g.label}
+          </Link>
+        ))}
+      </div>
+
+      {/* ── Now Playing sign ── */}
       <div className="now-playing-sign" aria-hidden="true">
-        <span className="now-playing-text">✦ &nbsp; NOW PLAYING &nbsp; ✦</span>
+        <span className="now-playing-text">✦ &nbsp; Trending Now &nbsp; ✦</span>
       </div>
 
       {/* ── Feature columns ── */}
@@ -157,7 +135,7 @@ export default function Home() {
           <h2 className="feature-col__title">Top Rated</h2>
           <p className="feature-col__copy">
             Let the crowd be your guide. Our highest-rated productions as
-            reviewed by distinguished patrons of the Palace.
+            reviewed by distinguished patrons of Lumière.
           </p>
           <Link href="/browse?sort=top_rated" className="feature-col__link">
             View Top Picks <span>→</span>
@@ -168,4 +146,3 @@ export default function Home() {
     </div>
   );
 }
-

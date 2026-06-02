@@ -173,7 +173,12 @@ function InfiniteColumn({
 
         setItems((prev) => {
           const existingIds = new Set(prev.map((i) => i.id));
-          const fresh = batch.filter((i) => !existingIds.has(i.id));
+          const seen = new Set<number>();
+          const fresh = batch.filter((i) => {
+            if (existingIds.has(i.id) || seen.has(i.id)) return false;
+            seen.add(i.id);
+            return true;
+          });
           if (fresh.length === 0) {
             hasMoreRef.current = false;
             setHasMore(false);

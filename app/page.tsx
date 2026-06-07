@@ -400,19 +400,16 @@ export default function Home() {
       </section>
 
       {/* ── Genre chips ── */}
-      <div className="genre-chips-row" role="list" aria-label="Browse by genre">
+      <ul className="genre-chips-row" aria-label="Browse by genre">
         {GENRES.map((g) => (
-          <Link
-            key={g.label}
-            href={g.href}
-            className="genre-chip"
-            role="listitem"
-          >
-            <GenreIcon name={g.icon} />
-            {g.label}
-          </Link>
+          <li key={g.label}>
+            <Link href={g.href} className="genre-chip">
+              <GenreIcon name={g.icon} />
+              {g.label}
+            </Link>
+          </li>
         ))}
-      </div>
+      </ul>
 
       {/* ── Now Playing sign ── */}
       <div className="now-playing-sign" aria-hidden="true">

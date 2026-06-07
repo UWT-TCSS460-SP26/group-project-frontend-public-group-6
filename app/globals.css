@@ -29,7 +29,7 @@
 
   /* Text */
   --text: #f5e8c8;
-  --text-muted: #7a6a50;
+  --text-muted: #b8a88a;
   --text-dim: rgba(245, 232, 200, 0.45);
 
   /* Surfaces */
@@ -1324,7 +1324,7 @@ main {
 .btn-shine {
   position: absolute;
   top: 0;
-  left: -80%;
+  left: 0;
   width: 50%;
   height: 100%;
   background: linear-gradient(
@@ -1333,20 +1333,20 @@ main {
     rgba(255, 255, 255, 0.38) 50%,
     transparent 80%
   );
-  transform: skewX(-20deg);
   animation: btnShine 3.5s ease-in-out infinite;
 }
 @keyframes btnShine {
   0% {
-    left: -80%;
+    transform: translateX(-160%) skewX(-20deg);
     opacity: 1;
   }
   40% {
-    left: 130%;
+    transform: translateX(260%) skewX(-20deg);
     opacity: 1;
   }
   41%,
   100% {
+    transform: translateX(-160%) skewX(-20deg);
     opacity: 0;
   }
 }

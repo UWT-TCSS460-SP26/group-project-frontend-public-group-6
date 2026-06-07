@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Image from "next/image";
 import { auth } from "@/auth";
 import RatingReviewSection from "@/app/components/RatingReviewSection";
 
@@ -73,8 +74,14 @@ export default async function TvDetailPage({
         <div className="detail-grid">
           {show.poster_path && (
             <div className="detail-poster">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={`${TMDB_IMG}${show.poster_path}`} alt={show.name} />
+              <Image
+                src={`${TMDB_IMG}${show.poster_path}`}
+                alt={show.name}
+                width={500}
+                height={750}
+                priority
+                style={{ width: "100%", height: "auto" }}
+              />
             </div>
           )}
 

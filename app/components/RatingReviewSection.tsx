@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import StarRating from "@/app/components/StarRating";
+import LoginModal from "@/app/components/LoginModal";
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL!;
 
@@ -37,6 +37,26 @@ type Props = {
   accessToken: string | null;
   userName?: string | null;
 };
+
+function PencilIcon() {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" width="20" height="20">
+      <path d="M14.5 2.5L17.5 5.5L7 16H4V13L14.5 2.5Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+      <line x1="12" y1="5" x2="15" y2="8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function TrashIcon() {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" width="20" height="20">
+      <line x1="4" y1="6" x2="16" y2="6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M7 6V5C7 4.45 7.45 4 8 4H12C12.55 4 13 4.45 13 5V6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M6 6L7 17H13L14 6H6Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+      <line x1="10" y1="9" x2="10" y2="14" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+    </svg>
+  );
+}
 
 export default function RatingReviewSection({
   mediaType,
@@ -180,7 +200,6 @@ export default function RatingReviewSection({
             setEditError(d.error ?? "Failed to update rating");
             return;
           }
-          // 404: rating was already gone
           const newCount = Math.max(0, totalRatings - 1);
           if (newCount === 0) {
             setCommunityAvg(null);
@@ -302,16 +321,14 @@ export default function RatingReviewSection({
           </div>
         ) : (
           <p className="community-stat community-stat--empty">
-            No ratings yet — be the first!
+            No ratings yet — be the first!!
           </p>
         )}
       </div>
 
       {/* ── User contribution area ──────────────────────────────────── */}
       {!accessToken ? (
-        <Link href="/api/auth/signin" className="btn btn-secondary">
-          Sign in to rate or review
-        </Link>
+        <LoginModal />
       ) : editMode ? (
         /* ── Edit form ──────────────────────────────────────────────── */
         <div className="rr-contribution">
@@ -322,12 +339,13 @@ export default function RatingReviewSection({
                 <StarRating value={editScore} onChange={setEditScore} size={32} />
               </div>
               <button
-                className="btn btn-ghost btn-sm"
+                className="icon-btn icon-btn--danger"
                 onClick={deleteRating}
                 disabled={deleteLoading || editLoading}
-                aria-label="Delete rating"
+                aria-label="Delete your rating"
+                title="Delete rating"
               >
-                Delete
+                <TrashIcon />
               </button>
             </div>
           )}
@@ -347,12 +365,13 @@ export default function RatingReviewSection({
                 />
               </div>
               <button
-                className="btn btn-ghost btn-sm"
+                className="icon-btn icon-btn--danger"
                 onClick={deleteReview}
                 disabled={deleteLoading || editLoading}
-                aria-label="Delete review"
+                aria-label="Delete your review"
+                title="Delete review"
               >
-                Delete
+                <TrashIcon />
               </button>
             </div>
           )}
@@ -381,15 +400,20 @@ export default function RatingReviewSection({
             <div className="review-card review-card--mine">
               <div className="review-card__header">
                 <span className="review-card__author">{userName ?? "You"}</span>
-                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                   <span className="review-card__sep" aria-hidden="true">·</span>
                   <span className="review-card__date">
                     {new Date(
                       (myReview?.createdAt ?? myRating?.createdAt)!
                     ).toLocaleDateString()}
                   </span>
-                  <button className="btn btn-secondary btn-sm" onClick={openEdit}>
-                    Edit
+                  <button
+                    className="icon-btn"
+                    onClick={openEdit}
+                    aria-label="Edit your rating or review"
+                    title="Edit"
+                  >
+                    <PencilIcon />
                   </button>
                 </div>
               </div>
@@ -490,7 +514,7 @@ export default function RatingReviewSection({
       )}
 
       {communityReviews.length === 0 && !myReview && accessToken && (
-        <p className="muted-note">No reviews yet.</p>
+        <p className="muted-note">No reviews yet — be the first!!</p>
       )}
     </section>
   );

@@ -19,11 +19,13 @@ type PersonCredit = {
 export default async function SearchPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; type?: string }>;
+  searchParams: Promise<{ q?: string; type?: string; mediaFilter?: string }>;
 }) {
-  const { q = "", type = "media" } = await searchParams;
+  const { q = "", type = "media", mediaFilter = "all" } = await searchParams;
   const query = q.trim();
   const searchType = type === "people" ? "people" : "media";
+  const peopleMediaFilter =
+    mediaFilter === "movie" ? "movie" : mediaFilter === "tv" ? "tv" : "all";
 
   let movies: MovieSummary[] = [];
   let tvShows: TvSummary[] = [];
@@ -44,7 +46,7 @@ export default async function SearchPage({
       if (tvRes.ok) tvShows = await tvRes.json();
     } else {
       const res = await fetch(
-        `${API}/v1/people/search?name=${encodeURIComponent(query)}&limit=20`,
+        `${API}/v1/people/search?name=${encodeURIComponent(query)}&media_type=${peopleMediaFilter}&limit=20`,
         { next: { revalidate: 60 } }
       );
       if (res.ok) {
@@ -57,16 +59,27 @@ export default async function SearchPage({
 
   const mediaTotal = movies.length + tvShows.length;
 
+  const peopleSubtitle =
+    peopleMediaFilter === "movie"
+      ? "Find movies by cast member name."
+      : peopleMediaFilter === "tv"
+        ? "Find TV shows by cast member name."
+        : "Find movies and TV shows by cast member name.";
+
   return (
     <div className="page-container">
       <div className="page-card">
         <h1 className="section-title">Search</h1>
         <p className="section-subtitle">
           {searchType === "people"
-            ? "Find movies and TV shows by cast member name."
+            ? peopleSubtitle
             : "Find movies and TV shows by title."}
         </p>
-        <SearchForm defaultQuery={query} defaultType={searchType} />
+        <SearchForm
+          defaultQuery={query}
+          defaultType={searchType}
+          defaultMediaFilter={peopleMediaFilter}
+        />
 
         {/* ── Media results ──────────────────────────────────── */}
         {searchType === "media" && (

@@ -80,6 +80,7 @@ export default async function TvDetailPage({
                 width={500}
                 height={750}
                 priority
+                sizes="(max-width: 768px) 100vw, 260px"
                 style={{ width: "100%", height: "auto" }}
               />
             </div>

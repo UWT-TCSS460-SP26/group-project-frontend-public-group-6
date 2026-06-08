@@ -19,6 +19,26 @@ export type ProfileReview = {
 
 type Props = { initialReviews: ProfileReview[]; accessToken: string };
 
+function PencilIcon() {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" width="20" height="20">
+      <path d="M14.5 2.5L17.5 5.5L7 16H4V13L14.5 2.5Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+      <line x1="12" y1="5" x2="15" y2="8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function TrashIcon() {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" width="20" height="20">
+      <line x1="4" y1="6" x2="16" y2="6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M7 6V5C7 4.45 7.45 4 8 4H12C12.55 4 13 4.45 13 5V6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M6 6L7 17H13L14 6H6Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+      <line x1="10" y1="9" x2="10" y2="14" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export default function ProfileReviewsList({
   initialReviews,
   accessToken,
@@ -81,7 +101,7 @@ export default function ProfileReviewsList({
   }
 
   if (reviews.length === 0)
-    return <p className="muted-note">No reviews yet.</p>;
+    return <p className="muted-note">No reviews yet — be the first!!</p>;
 
   return (
     <div className="profile-list">
@@ -156,21 +176,25 @@ export default function ProfileReviewsList({
           {editingId !== review.id && (
             <div className="profile-item__actions">
               <button
-                className="btn btn-secondary btn-sm"
+                className="icon-btn"
                 onClick={() => {
                   setEditBody(review.body);
                   setEditingId(review.id);
                 }}
                 disabled={loading}
+                aria-label={`Edit review for ${review.tmdb?.title ?? "this title"}`}
+                title="Edit review"
               >
-                Edit
+                <PencilIcon />
               </button>
               <button
-                className="btn btn-ghost btn-sm"
+                className="icon-btn icon-btn--danger"
                 onClick={() => deleteReview(review.id)}
                 disabled={loading}
+                aria-label={`Delete review for ${review.tmdb?.title ?? "this title"}`}
+                title="Delete review"
               >
-                Delete
+                <TrashIcon />
               </button>
             </div>
           )}

@@ -120,7 +120,11 @@ export default async function SearchPage({
         <h1 className="section-title">Search</h1>
         <p className="section-subtitle">
           {searchType === "people"
-            ? "Find movies and TV shows by cast member name."
+            ? peopleFilter === "movie"
+              ? "Find movies by cast member name."
+              : peopleFilter === "tv"
+                ? "Find TV shows by cast member name."
+                : "Find movies and TV shows by cast member name."
             : "Find movies and TV shows by title."}
         </p>
         <SearchForm

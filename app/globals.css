@@ -1423,6 +1423,16 @@ main {
   letter-spacing: 2px;
 }
 
+.btn-danger {
+  background: #c0392b;
+  color: #fff;
+  border-color: #c0392b;
+}
+.btn-danger:hover:not(:disabled) {
+  background: #a93226;
+  border-color: #a93226;
+}
+
 .hero .btn-secondary {
   background: rgba(255, 255, 255, 0.09);
   color: var(--text);
@@ -1556,6 +1566,17 @@ details[open] .filters-summary::after {
   outline: none;
   border-color: var(--gold-border);
   box-shadow: 0 0 0 3px var(--gold-soft);
+}
+.search-form-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.search-tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 .search-form {
   display: flex;
@@ -2996,6 +3017,237 @@ details[open] .filters-summary::after {
   display: block;
   -webkit-line-clamp: unset;
   overflow: visible;
+}
+
+/* ════════════════════════════════
+   ICON BUTTONS — pencil, trash, close
+   ════════════════════════════════ */
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition:
+    color 0.15s ease,
+    background 0.15s ease;
+  flex-shrink: 0;
+}
+.icon-btn:hover:not(:disabled) {
+  color: var(--text);
+  background: var(--surface-hover);
+}
+.icon-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.icon-btn--danger:hover:not(:disabled) {
+  color: #ff6b6b;
+  background: rgba(255, 107, 107, 0.1);
+}
+.icon-btn svg {
+  flex-shrink: 0;
+}
+
+/* ════════════════════════════════
+   LOGIN MODAL
+   ════════════════════════════════ */
+.login-modal {
+  border: none;
+  background: transparent;
+  padding: 0;
+  max-width: 100vw;
+  max-height: 100vh;
+  overflow: visible;
+}
+.login-modal::backdrop {
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(4px);
+}
+.login-modal__inner {
+  background: var(--bg-card);
+  border: 1px solid var(--gold-border);
+  border-radius: var(--radius-xl);
+  padding: 40px 36px 36px;
+  width: min(420px, 90vw);
+  position: relative;
+  text-align: center;
+  box-shadow:
+    0 0 0 1px var(--border),
+    0 0 60px rgba(212, 175, 55, 0.15),
+    0 32px 80px rgba(0, 0, 0, 0.6);
+}
+/* Art deco top accent line */
+.login-modal__inner::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 16px;
+  right: 16px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+}
+.login-modal__close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  min-width: 40px;
+  min-height: 40px;
+}
+.login-modal__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  color: var(--gold-dark);
+  animation: logoGlow 3s ease-in-out infinite;
+}
+.login-modal__title {
+  font-family: var(--font-heading, "Cinzel", serif);
+  font-size: 1.35rem;
+  font-weight: 900;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--text);
+  margin: 0 0 12px;
+}
+.login-modal__desc {
+  color: var(--text-muted);
+  font-style: italic;
+  line-height: 1.7;
+  margin: 0 0 28px;
+  font-size: 0.95rem;
+}
+.login-modal__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.login-modal__btn {
+  width: 100%;
+  justify-content: center;
+}
+.login-modal__status {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-style: italic;
+  text-align: center;
+  margin: 0 0 8px;
+  line-height: 1.5;
+}
+.login-modal__status--warn {
+  font-style: normal;
+  color: var(--gold);
+  background: var(--gold-soft);
+  border: 1px solid var(--gold-border);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+}
+.login-modal__fallback-link {
+  color: var(--gold);
+  text-decoration: underline;
+  font-weight: 700;
+}
+.login-modal__fallback-link:hover {
+  color: var(--gold-bright);
+}
+
+/* ── Auth popup shell (the small popup window itself) ── */
+.auth-popup-shell {
+  min-height: 100vh;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.auth-popup-card {
+  text-align: center;
+  padding: 48px 40px;
+}
+.auth-popup-icon {
+  display: block;
+  font-size: 2rem;
+  color: var(--gold-dark);
+  margin-bottom: 20px;
+  animation: logoGlow 3s ease-in-out infinite;
+}
+.auth-popup-label {
+  font-family: var(--font-heading, "Cinzel", serif);
+  font-size: 0.72rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* ════════════════════════════════
+   404 NOT FOUND PAGE
+   ════════════════════════════════ */
+.not-found-card {
+  text-align: center;
+  padding: 72px 48px;
+  margin: 32px auto;
+  max-width: 580px;
+}
+.not-found-ornament {
+  font-size: 2.2rem;
+  color: var(--gold-dark);
+  opacity: 0.45;
+  display: block;
+  margin-bottom: 16px;
+  animation: logoGlow 3s ease-in-out infinite;
+}
+.not-found-code {
+  font-family: var(--font-heading, "Cinzel", serif);
+  font-size: clamp(5rem, 14vw, 9rem);
+  font-weight: 900;
+  color: transparent;
+  background: linear-gradient(180deg, var(--gold-bright) 0%, var(--gold-dark) 60%, transparent 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  letter-spacing: 0.15em;
+  margin: 0;
+  line-height: 1;
+}
+.not-found-title {
+  font-family: var(--font-heading, "Cinzel", serif);
+  font-size: clamp(1.1rem, 3vw, 1.6rem);
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--text);
+  margin: 16px 0 18px;
+}
+.not-found-copy {
+  color: var(--text-muted);
+  font-style: italic;
+  line-height: 1.8;
+  max-width: 400px;
+  margin: 0 auto;
+}
+.not-found-divider {
+  width: 60px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-dark), transparent);
+  margin: 28px auto;
+}
+
+/* ════════════════════════════════
+   SEARCH — Sub-tabs (media type toggle)
+   ════════════════════════════════ */
+.search-tabs--sub {
+  margin-top: 8px;
+  opacity: 0.9;
+}
+.search-tabs--sub .btn {
+  font-size: 0.6rem;
+  padding: 0.35rem 0.85rem;
 }
 
 /* Profile empty state */

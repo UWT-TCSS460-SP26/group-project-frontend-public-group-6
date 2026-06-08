@@ -1,7 +1,8 @@
 import Link from "next/link";
 import NavLink from "@/components/NavLink";
+import SignInButton from "@/components/SignInButton";
 import MobileNav from "@/components/MobileNav";
-import { auth, signIn, signOut } from "@/auth";
+import { auth, signOut } from "@/auth";
 
 const NAV_DISCOVER = [
   { icon: "home", label: "Home", href: "/" },
@@ -541,20 +542,7 @@ export default async function Header() {
             </form>
           </>
         ) : (
-          <form
-            action={async () => {
-              "use server";
-              await signIn("tcss460");
-            }}
-          >
-            <button
-              type="submit"
-              className="btn btn-primary btn-sm"
-              style={{ width: "100%" }}
-            >
-              Sign In
-            </button>
-          </form>
+          <SignInButton />
         )}
       </div>
 

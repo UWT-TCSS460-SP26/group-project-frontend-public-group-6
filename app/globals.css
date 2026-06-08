@@ -311,6 +311,17 @@ main {
   overflow-y: auto;
   scrollbar-width: none;
 }
+
+.nav-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+/* Hidden on desktop; shown via media query on mobile */
+.mobile-menu {
+  display: none;
+}
 .site-nav::-webkit-scrollbar {
   display: none;
 }
@@ -2408,11 +2419,13 @@ details[open] .filters-summary::after {
     bottom: auto;
     width: 100%;
     flex-direction: row;
+    align-items: center;
     border-right: none;
     border-bottom: 1px solid var(--border);
     height: 58px;
     padding: 0 16px;
     min-height: unset;
+    overflow: visible;
   }
   .site-header::before {
     display: none;
@@ -2440,42 +2453,31 @@ details[open] .filters-summary::after {
     display: none;
   }
   .site-nav {
-    flex-direction: row;
-    padding: 0;
-    flex: 1;
-    gap: 0;
-    justify-content: center;
-    overflow: visible;
-  }
-  .nav-link {
-    padding: 8px 10px;
-    font-size: 0.58rem;
-    letter-spacing: 1px;
-    gap: 5px;
-  }
-  .nav-link::before {
-    top: auto;
-    bottom: 0;
-    left: 15%;
-    right: 15%;
-    width: auto;
-    height: 2px;
-    border-radius: 2px 2px 0 0;
-  }
-  .nav-section-label {
     display: none;
+  }
+  .nav-user-email {
+    display: none;
+  }
+  .mobile-menu {
+    display: flex;
+    align-items: center;
+    position: relative;
+    flex-shrink: 0;
+    margin-left: 8px;
   }
   .nav-actions {
     flex-direction: row;
     padding: 0;
     border-top: none;
     gap: 6px;
+    margin-left: auto;
+    align-items: center;
   }
   .nav-actions::before {
     display: none;
   }
   .nav-actions .btn {
-    width: auto;
+    width: auto !important;
     padding: 6px 12px;
     font-size: 0.58rem;
   }
@@ -2525,8 +2527,31 @@ details[open] .filters-summary::after {
   .detail-grid {
     grid-template-columns: 1fr;
   }
-  .browse-columns {
-    grid-template-columns: 1fr;
+  .profile-header--lumiere {
+    gap: 16px;
+    padding: 16px;
+  }
+  .avatar-btn {
+    width: 64px;
+    height: 64px;
+  }
+  .avatar-initials {
+    font-size: 1.2rem;
+  }
+  .avatar-hint {
+    display: none;
+  }
+  .browse-columns,
+  .browse-columns--split {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  .browse-columns-divider {
+    display: none;
+  }
+  .browse-page-card {
+    margin: 8px;
+    padding: 16px;
   }
 }
 
@@ -2540,6 +2565,99 @@ details[open] .filters-summary::after {
   .ticker-wrap {
     display: none;
   }
+}
+
+/* ════════════════════════════════
+   MOBILE MENU — hamburger dropdown
+   ════════════════════════════════ */
+.mobile-menu-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+  flex-shrink: 0;
+  padding: 0;
+}
+.mobile-menu-btn:hover,
+.mobile-menu-btn[aria-expanded="true"] {
+  background: var(--gold-soft);
+  border-color: var(--gold-border);
+  color: var(--gold);
+}
+
+.mobile-menu-icon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.mobile-menu-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.mobile-menu-dropdown {
+  position: fixed;
+  top: 58px;
+  left: 0;
+  right: 0;
+  width: 100%;
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border-strong);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.7);
+  z-index: 9999;
+  overflow-y: auto;
+  max-height: calc(100vh - 58px);
+  animation: fadeSlideDown 0.18s ease both;
+}
+
+.mobile-menu-section {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+.mobile-menu-section:last-child {
+  border-bottom: none;
+  padding-bottom: 16px;
+}
+
+.mobile-menu-section-label {
+  display: block;
+  font-family: var(--font-heading, "Cinzel", serif);
+  font-size: 0.45rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(212, 175, 55, 0.35);
+  padding: 8px 20px 4px;
+}
+
+.mobile-menu-link {
+  display: block;
+  padding: 11px 20px;
+  font-family: var(--font-heading, "Cinzel", serif);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition:
+    color 0.12s ease,
+    background 0.12s ease;
+}
+.mobile-menu-link:hover {
+  color: var(--gold);
+  background: rgba(212, 175, 55, 0.06);
 }
 
 /* ════════════════════════════════

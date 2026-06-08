@@ -88,6 +88,7 @@ export default function RatingReviewSection({
 
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   useEffect(() => {
     if (!accessToken) return;
@@ -173,6 +174,7 @@ export default function RatingReviewSection({
     setEditScore(myRating?.score ?? null);
     setEditBody(myReview?.body ?? "");
     setEditError(null);
+    setConfirmDelete(false);
     setEditMode(true);
   }
 
@@ -300,6 +302,50 @@ export default function RatingReviewSection({
     }
   }
 
+  async function handleDeleteAll() {
+    if (!accessToken) return;
+    setDeleteLoading(true);
+    setDeleteError(null);
+    try {
+      if (myRating) {
+        const oldScore = myRating.score;
+        const res = await fetch(`${API}/v1/ratings/${myRating.id}`, {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        if (!res.ok && res.status !== 404) {
+          const d = await res.json().catch(() => ({}));
+          setDeleteError(d.error ?? "Failed to delete rating");
+          return;
+        }
+        const newCount = Math.max(0, totalRatings - 1);
+        if (newCount === 0) {
+          setCommunityAvg(null);
+          setTotalRatings(0);
+        } else {
+          setCommunityAvg(((communityAvg ?? 0) * totalRatings - oldScore) / newCount);
+          setTotalRatings(newCount);
+        }
+        setMyRating(null);
+      }
+      if (myReview) {
+        const res = await fetch(`${API}/v1/reviews/${myReview.id}`, {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        if (!res.ok && res.status !== 404) {
+          const d = await res.json().catch(() => ({}));
+          setDeleteError(d.error ?? "Failed to delete review");
+          return;
+        }
+        setReviews((prev) => prev.filter((r) => r.id !== myReview.id));
+        setMyReview(null);
+      }
+    } finally {
+      setDeleteLoading(false);
+    }
+  }
+
   const hasContribution = myRating || myReview;
   const communityReviews = reviews.filter((r) => r.id !== myReview?.id);
 
@@ -415,10 +461,43 @@ export default function RatingReviewSection({
                   >
                     <PencilIcon />
                   </button>
+                  {confirmDelete ? (
+                    <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                      <span style={{ fontSize: "0.8rem", color: "var(--color-muted, #888)" }}>Delete?</span>
+                      <button
+                        className="btn btn-danger btn-sm"
+                        onClick={() => { setConfirmDelete(false); handleDeleteAll(); }}
+                        disabled={deleteLoading}
+                      >
+                        Yes
+                      </button>
+                      <button
+                        className="btn btn-ghost btn-sm"
+                        onClick={() => setConfirmDelete(false)}
+                      >
+                        No
+                      </button>
+                    </span>
+                  ) : (
+                    <button
+                      className="icon-btn icon-btn--danger"
+                      onClick={() => { setDeleteError(null); setConfirmDelete(true); }}
+                      disabled={deleteLoading}
+                      aria-label="Delete your rating and review"
+                      title="Delete"
+                    >
+                      <TrashIcon />
+                    </button>
+                  )}
                 </div>
               </div>
               {myRating && <StarRating value={myRating.score} readonly size={16} />}
               {myReview && <p className="review-card__body">{myReview.body}</p>}
+              {deleteError && (
+                <p className="alert field-error" role="alert" style={{ marginTop: "8px" }}>
+                  {deleteError}
+                </p>
+              )}
             </div>
           )}
 

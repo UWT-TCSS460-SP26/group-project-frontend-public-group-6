@@ -1412,6 +1412,16 @@ main {
   letter-spacing: 2px;
 }
 
+.btn-danger {
+  background: #c0392b;
+  color: #fff;
+  border-color: #c0392b;
+}
+.btn-danger:hover:not(:disabled) {
+  background: #a93226;
+  border-color: #a93226;
+}
+
 .hero .btn-secondary {
   background: rgba(255, 255, 255, 0.09);
   color: var(--text);

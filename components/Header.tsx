@@ -8,6 +8,7 @@ const NAV_DISCOVER = [
   { icon: "television", label: "TV Shows", href: "/browse?type=tv" },
   { icon: "trending", label: "Trending", href: "/browse?sort=trending" },
   { icon: "search", label: "Search", href: "/search" },
+  { icon: "about", label: "About", href: "/about" },
 ];
 
 const NAV_GENRES = [
@@ -449,6 +450,13 @@ function NavIcon({ name }: { name: string }) {
           strokeWidth="1.2"
           strokeLinejoin="round"
         />
+      </svg>
+    ),
+    about: (
+      <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="10" cy="10" r="7.5" stroke="currentColor" strokeWidth="1.2" />
+        <line x1="10" y1="9" x2="10" y2="14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <circle cx="10" cy="6.5" r="1" fill="currentColor" />
       </svg>
     ),
   };

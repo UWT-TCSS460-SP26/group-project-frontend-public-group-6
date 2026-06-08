@@ -2,29 +2,50 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "About — Lumière",
-  description: "Meet the team behind Lumière and learn what powers it.",
+  description:
+    "Meet the team behind Lumière and learn what powers the movie and television discovery experience.",
 };
 
 const TEAM = [
   {
     name: "Luke Willis",
-    sprints: "Sprints 1–8",
-    roles: ["Back-end API", "Database design", "Front-end lead", "Deployment"],
+    roles: [
+      "Back-End API",
+      "Database Design",
+      "Front-End Lead",
+      "Deployment",
+      "Authentication",
+    ],
   },
   {
     name: "Jayda Minks",
-    sprints: "Sprints 1–8",
-    roles: ["Back-end API", "Authentication", "Front-end UI", "Testing"],
+    roles: [
+      "Back-End API",
+      "Front-End Design Lead",
+      "Front-End UI",
+      "Testing",
+      "User Experience",
+    ],
   },
   {
     name: "Connor Willis",
-    sprints: "Sprints 1–8",
-    roles: ["Back-end API", "Data modeling", "Front-end components", "Reviews"],
+    roles: [
+      "Back-End Lead",
+      "Data Modeling",
+      "Front-End Components",
+      "Reviews",
+      "Deployment",
+    ],
   },
   {
     name: "John Diego",
-    sprints: "Sprints 1–8",
-    roles: ["Back-end API", "Sprint planning", "Front-end design", "Styling"],
+    roles: [
+      "Back-End API",
+      "Sprint Planning",
+      "Front-End Design",
+      "Styling",
+      "Team Accounting",
+    ],
   },
 ];
 
@@ -51,10 +72,30 @@ const SERVICES = [
 
 function Divider() {
   return (
-    <div aria-hidden="true" style={{ display: "flex", alignItems: "center", gap: "12px", margin: "2rem 0" }}>
-      <div style={{ flex: 1, height: "1px", background: "var(--gold-border)" }} />
-      <span style={{ color: "var(--gold)", fontSize: "0.7rem", letterSpacing: "0.15em" }}>◈</span>
-      <div style={{ flex: 1, height: "1px", background: "var(--gold-border)" }} />
+    <div
+      aria-hidden="true"
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "12px",
+        margin: "2rem 0",
+      }}
+    >
+      <div
+        style={{ flex: 1, height: "1px", background: "var(--gold-border)" }}
+      />
+      <span
+        style={{
+          color: "var(--gold)",
+          fontSize: "0.7rem",
+          letterSpacing: "0.15em",
+        }}
+      >
+        ◈
+      </span>
+      <div
+        style={{ flex: 1, height: "1px", background: "var(--gold-border)" }}
+      />
     </div>
   );
 }
@@ -104,8 +145,8 @@ export default function AboutPage() {
             margin: "0 auto",
           }}
         >
-          Lumière is a cinema and television discovery app built by six
-          students at the University of Washington Tacoma over ten weeks of
+          Lumière is a cinema and television discovery app built by four
+          students at the University of Washington - Tacoma over ten weeks of
           TCSS 460 — Client/Server Programming.
         </p>
       </div>
@@ -131,8 +172,9 @@ export default function AboutPage() {
 
         <div
           style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "center",
             gap: "1rem",
           }}
         >
@@ -144,6 +186,7 @@ export default function AboutPage() {
                 border: "1px solid var(--gold-border)",
                 borderRadius: "var(--radius)",
                 padding: "1.25rem 1.5rem",
+                flex: "0 0 220px",
               }}
             >
               <p
@@ -156,16 +199,6 @@ export default function AboutPage() {
                 }}
               >
                 {member.name}
-              </p>
-              <p
-                style={{
-                  fontSize: "0.72rem",
-                  color: "var(--text-dim)",
-                  letterSpacing: "0.08em",
-                  margin: "0 0 0.75rem",
-                }}
-              >
-                {member.sprints}
               </p>
               <ul
                 style={{
@@ -210,13 +243,18 @@ export default function AboutPage() {
             lineHeight: 1.7,
           }}
         >
-          <strong style={{ color: "var(--text)" }}>Sprints 1–4</strong> were
+          <strong style={{ color: "var(--text)" }}>Sprints 1–5</strong> were
           spent building the back-end: REST API, database schema, authentication
-          middleware, and the bug-tracker interface that downstream partners used
-          to file issues.{" "}
-          <strong style={{ color: "var(--text)" }}>Sprints 5–8</strong> shifted
+          middleware, TMDB integration with transformed routes, and the
+          bug-tracker interface that downstream partners used to file issues and
+          feature requests.{" "}
+          <strong style={{ color: "var(--text)" }}>Sprints 6–8 </strong> shifted
           to the consumer-facing front-end — this app — built with Next.js 15,
-          React 19, and Tailwind CSS v4.
+          React 19, and Tailwind CSS v4 built upon Group 5&apos;s backend API.
+          Along with teamwork, cohesion, and communication within our own group,
+          we had to work closely as the recipients of another group&apos;s work,
+          teaching us how to work with unknown APIs and when to point out bugs
+          vs. work around intended behavior.
         </p>
       </section>
 
@@ -279,7 +317,7 @@ export default function AboutPage() {
                       href={svc.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      style={{ color: "var(--gold)", textDecoration: "none" }}
+                      style={{ color: "inherit", textDecoration: "none" }}
                     >
                       {svc.name}
                     </a>
@@ -329,11 +367,14 @@ export default function AboutPage() {
             margin: "0 0 1rem",
           }}
         >
-          We started the quarter designing a REST API in isolation — then watched it
-          become real infrastructure the moment Group 5 started building their
-          consumer app on top of it. That handoff taught us more about API design
-          than any spec could: every ambiguous field name, every missing error code,
-          every undocumented constraint became a bug report in our queue.
+          We started the quarter designing a REST API in isolation — then
+          watched it become real infrastructure the moment Group 7 started
+          building their consumer app on top of it. That handoff taught us more
+          about API design than any spec could: every ambiguous field name,
+          every missing error code, every undocumented constraint became a bug
+          report in our queue. Moreso, we learned how to adapt to feature
+          requests, triage reports, and deliver clear, consistent, and
+          well-built APIs back to the client team.
         </p>
         <p
           style={{
@@ -343,11 +384,48 @@ export default function AboutPage() {
             margin: 0,
           }}
         >
-          On the front-end side, building a consumer app against someone else&apos;s
-          API gave us the other perspective. The biggest surprise was how much of the
-          UX lives in the client — loading states, error messages, empty states — none
-          of that is in the API contract. Lumière&apos;s art deco aesthetic came from
-          wanting the app to feel as cinematic as the content it surfaces.
+          On the front-end side, building a consumer app against someone
+          else&apos;s API gave us the reverse perspective. The biggest surprise
+          was how much of the UX lives in the client — loading states, error
+          messages, empty states — none of that is in the API contract. We
+          learned the dance between the client and the server, and how to build
+          a strong front-end held up by an ambiguous (to us) back-end.
+          Lumière&apos;s art deco aesthetic came from the desire for the app to
+          feel as cinematic as the content it surfaces.
+        </p>
+        <p
+          style={{
+            fontSize: "0.95rem",
+            color: "var(--text-muted)",
+            lineHeight: 1.8,
+            margin: "0 0 1rem",
+          }}
+        >
+          We are proud of the design, implementation, and execution of this
+          project.
+        </p>
+        <p
+          style={{
+            fontSize: "0.95rem",
+            color: "var(--text-muted)",
+            lineHeight: 1.8,
+            margin: "0 0 1rem",
+          }}
+        >
+          We hope you enjoy our content to your hearts content.
+        </p>
+        <p
+          style={{
+            fontSize: "0.95rem",
+            color: "var(--text-muted)",
+            lineHeight: 1.8,
+            margin: 0,
+            textAlign: "center",
+          }}
+        >
+          Much love,
+          <br />
+          Group 6.
         </p>
       </section>
 
@@ -358,12 +436,12 @@ export default function AboutPage() {
         style={{
           textAlign: "center",
           fontSize: "0.75rem",
-          color: "var(--text-dim)",
+          color: "var(--text-muted)",
           letterSpacing: "0.08em",
         }}
       >
         University of Washington Tacoma · School of Engineering and Technology ·
-        TCSS 460 Spring 2026
+        Group 6 - TCSS 460 Spring 2026
       </p>
     </main>
   );

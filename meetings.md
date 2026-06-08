@@ -24,3 +24,15 @@
 - Took Connor's work from reviews since Jada's version had bugs 
 
 - Discussed the remaining tasks to be done
+
+# Group 6 2026-05-24 Sprint 7 Meeting 1 (4:30 - 6:50)
+
+**Modality: Discord**
+
+**In attendance: Luke, Jayda, Connor, John**
+**Notes taker: John**
+**Meeting Manager: Jayda**
+
+- Finalizing frontend design
+- Fixing remaining bugs
+- Discussed the design for final

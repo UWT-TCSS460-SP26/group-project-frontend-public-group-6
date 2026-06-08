@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ReviewsTicker from "@/components/ReviewsTicker";
 
 /* ── Inline SVG genre icons — art deco style ── */
 function GenreIcon({ name }: { name: string }) {
@@ -230,21 +231,8 @@ const GENRES = [
 export default function Home() {
   return (
     <div className="page-container">
-      {/* ── Marquee ticker strip ── */}
-      <div className="ticker-wrap">
-        <div className="ticker-track">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <span key={i} className="ticker-content">
-              <span className="ticker-star">★</span> NOW SHOWING &nbsp;
-              <span className="ticker-star">✦</span> COMING SOON &nbsp;
-              <span className="ticker-star">★</span> TWO FEATURES NIGHTLY &nbsp;
-              <span className="ticker-star">✦</span> DOORS OPEN AT SEVEN &nbsp;
-              <span className="ticker-star">★</span> 10,000+ TITLES &nbsp;
-              <span className="ticker-star">✦</span> RESERVE YOUR SEATS &nbsp;
-            </span>
-          ))}
-        </div>
-      </div>
+      {/* ── Live reviews ticker strip ── */}
+      <ReviewsTicker />
 
       {/* ── Hero ── */}
       <section className="hero" aria-label="Welcome">
@@ -317,34 +305,10 @@ export default function Home() {
                     stroke="currentColor"
                     strokeWidth="0.7"
                   />
-                  <rect
-                    x="2.5"
-                    y="3"
-                    width="1"
-                    height="2.5"
-                    fill="currentColor"
-                  />
-                  <rect
-                    x="5"
-                    y="3"
-                    width="1"
-                    height="2.5"
-                    fill="currentColor"
-                  />
-                  <rect
-                    x="10"
-                    y="3"
-                    width="1"
-                    height="2.5"
-                    fill="currentColor"
-                  />
-                  <rect
-                    x="12.5"
-                    y="3"
-                    width="1"
-                    height="2.5"
-                    fill="currentColor"
-                  />
+                  <rect x="2.5" y="3" width="1" height="2.5" fill="currentColor" />
+                  <rect x="5" y="3" width="1" height="2.5" fill="currentColor" />
+                  <rect x="10" y="3" width="1" height="2.5" fill="currentColor" />
+                  <rect x="12.5" y="3" width="1" height="2.5" fill="currentColor" />
                   <polygon points="6.5,7 10.5,8 6.5,9" fill="currentColor" />
                 </svg>
               </span>
@@ -426,31 +390,9 @@ export default function Home() {
               xmlns="http://www.w3.org/2000/svg"
               className="feature-col__svg"
             >
-              <rect
-                x="4"
-                y="10"
-                width="40"
-                height="28"
-                rx="2"
-                stroke="currentColor"
-                strokeWidth="2.5"
-              />
-              <rect
-                x="4"
-                y="17"
-                width="40"
-                height="2"
-                stroke="currentColor"
-                strokeWidth="1.5"
-              />
-              <rect
-                x="4"
-                y="29"
-                width="40"
-                height="2"
-                stroke="currentColor"
-                strokeWidth="1.5"
-              />
+              <rect x="4" y="10" width="40" height="28" rx="2" stroke="currentColor" strokeWidth="2.5" />
+              <rect x="4" y="17" width="40" height="2" stroke="currentColor" strokeWidth="1.5" />
+              <rect x="4" y="29" width="40" height="2" stroke="currentColor" strokeWidth="1.5" />
               <rect x="8" y="10" width="2.5" height="7" fill="currentColor" />
               <rect x="15" y="10" width="2.5" height="7" fill="currentColor" />
               <rect x="30" y="10" width="2.5" height="7" fill="currentColor" />
@@ -480,44 +422,12 @@ export default function Home() {
               xmlns="http://www.w3.org/2000/svg"
               className="feature-col__svg"
             >
-              <rect
-                x="4"
-                y="8"
-                width="40"
-                height="28"
-                rx="3"
-                stroke="currentColor"
-                strokeWidth="2.5"
-              />
-              <line
-                x1="16"
-                y1="40"
-                x2="32"
-                y2="40"
-                stroke="currentColor"
-                strokeWidth="3"
-                strokeLinecap="round"
-              />
-              <line
-                x1="24"
-                y1="36"
-                x2="24"
-                y2="40"
-                stroke="currentColor"
-                strokeWidth="2.5"
-              />
+              <rect x="4" y="8" width="40" height="28" rx="3" stroke="currentColor" strokeWidth="2.5" />
+              <line x1="16" y1="40" x2="32" y2="40" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+              <line x1="24" y1="36" x2="24" y2="40" stroke="currentColor" strokeWidth="2.5" />
               <circle cx="37" cy="14" r="2" fill="currentColor" />
               <circle cx="42" cy="14" r="2" fill="currentColor" />
-              <line
-                x1="12"
-                y1="22"
-                x2="36"
-                y2="22"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeDasharray="3 2"
-              />
+              <line x1="12" y1="22" x2="36" y2="22" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="3 2" />
             </svg>
           </div>
           <h2 className="feature-col__title">Television Serials</h2>

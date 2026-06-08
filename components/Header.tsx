@@ -9,6 +9,7 @@ const NAV_DISCOVER = [
   { icon: "television", label: "TV Shows", href: "/browse?type=tv" },
   { icon: "trending", label: "Trending", href: "/browse?sort=trending" },
   { icon: "search", label: "Search", href: "/search" },
+  { icon: "about", label: "About", href: "/about" },
 ];
 
 const NAV_GENRES = [
@@ -452,6 +453,13 @@ function NavIcon({ name }: { name: string }) {
         />
       </svg>
     ),
+    about: (
+      <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="10" cy="10" r="7.5" stroke="currentColor" strokeWidth="1.2" />
+        <line x1="10" y1="9" x2="10" y2="14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <circle cx="10" cy="6.5" r="1" fill="currentColor" />
+      </svg>
+    ),
   };
   return (
     <span className="nav-svg-icon" aria-hidden="true">
@@ -484,18 +492,20 @@ export default async function Header() {
           />
         ))}
 
-        <span className="nav-section-label">Genres</span>
-        {NAV_GENRES.map((item) => (
-          <NavLink
-            key={item.href}
-            href={item.href}
-            label={item.label}
-            icon={<NavIcon name={item.icon} />}
-          />
-        ))}
+        <div className="nav-section nav-section--secondary">
+          <span className="nav-section-label">Genres</span>
+          {NAV_GENRES.map((item) => (
+            <NavLink
+              key={item.href}
+              href={item.href}
+              label={item.label}
+              icon={<NavIcon name={item.icon} />}
+            />
+          ))}
+        </div>
 
         {session?.user && (
-          <>
+          <div className="nav-section nav-section--secondary">
             <span className="nav-section-label">My Palace</span>
             {NAV_MY_PALACE.map((item) => (
               <NavLink
@@ -505,7 +515,7 @@ export default async function Header() {
                 icon={<NavIcon name={item.icon} />}
               />
             ))}
-          </>
+          </div>
         )}
       </nav>
 
@@ -534,6 +544,12 @@ export default async function Header() {
           <SignInButton />
         )}
       </div>
+
+      <MobileNav
+        discover={NAV_DISCOVER.map(({ label, href }) => ({ label, href }))}
+        genres={NAV_GENRES.map(({ label, href }) => ({ label, href }))}
+        myPalace={session?.user ? NAV_MY_PALACE.map(({ label, href }) => ({ label, href })) : []}
+      />
 
       <div className="sidebar-ornament" aria-hidden="true" />
     </header>

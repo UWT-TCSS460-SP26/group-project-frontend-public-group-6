@@ -2905,3 +2905,248 @@ details[open] .filters-summary::after {
   text-transform: uppercase;
   color: var(--text-muted);
 }
+
+/* ─── MediaCard subtitle — "as Character Name"
+   Match the title's font, weight, and color exactly ─────────── */
+.media-card__subtitle {
+  font-family: var(--font-heading, "Cinzel", serif);
+  font-size: 0.55rem;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text);           /* same colour as .media-card__title */
+  padding: 0 10px 8px;
+  line-height: 1.4;
+  opacity: 0.8;                 /* slight dimming so it reads as secondary */
+}
+ 
+/* ─── Search sub-tabs (All / Movies / TV Shows for people filter) ─ */
+.search-tabs--sub {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+ 
+/* ─── Reviews Ticker — inline styles for each part ──────────── */
+ 
+/* Author name — gold, heading font */
+.ticker-review-author {
+  font-family: var(--font-heading, "Cinzel", serif);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+ 
+/* "on" connector word — dim */
+.ticker-review-on {
+  font-family: var(--font-body, "Playfair Display", Georgia, serif);
+  font-style: italic;
+  font-size: 0.62rem;
+  color: var(--text-dim);
+  margin: 0 2px;
+}
+ 
+/* Movie/TV show title — slightly brighter gold, underline on hover */
+.ticker-review-title {
+  font-family: var(--font-heading, "Cinzel", serif);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--gold-bright);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+.ticker-review-title:hover {
+  color: #fff;
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 217, 91, 0.4);
+  text-underline-offset: 3px;
+}
+ 
+/* Em-dash separator */
+.ticker-review-sep {
+  color: var(--gold-border);
+  margin: 0 2px;
+}
+ 
+/* Review body excerpt — muted serif */
+.ticker-review-body {
+  font-family: var(--font-body, "Playfair Display", Georgia, serif);
+  font-style: italic;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  letter-spacing: 0.3px;
+}
+
+/* ── Section wrapper ── */
+.cast-section {
+  margin-top: 36px;
+  padding-top: 28px;
+  border-top: 1px solid var(--border);
+}
+ 
+/* ── Heading with flanking lines (matches existing art-deco style) ── */
+.cast-section__heading {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-family: var(--font-heading, "Cinzel", serif);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 0 0 20px;
+}
+.cast-section__heading-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--gold-border) 40%,
+    var(--gold-border) 60%,
+    transparent
+  );
+}
+ 
+/* ── Horizontally scrollable strip ── */
+.cast-scroll {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--gold-border) transparent;
+}
+.cast-scroll::-webkit-scrollbar {
+  height: 4px;
+}
+.cast-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.cast-scroll::-webkit-scrollbar-thumb {
+  background: var(--gold-border);
+  border-radius: 2px;
+}
+ 
+/* ── Individual cast card ── */
+.cast-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 96px;
+  scroll-snap-align: start;
+  text-decoration: none;
+  transition: transform 0.2s ease;
+}
+.cast-card:hover {
+  transform: translateY(-3px);
+}
+ 
+/* Photo circle */
+.cast-card__photo {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1.5px solid var(--gold-border);
+  background: var(--bg-elevated);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  flex-shrink: 0;
+}
+.cast-card:hover .cast-card__photo {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px var(--gold-soft), 0 4px 16px rgba(212, 175, 55, 0.2);
+}
+ 
+.cast-card__photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  display: block;
+  transition: transform 0.3s ease;
+}
+.cast-card:hover .cast-card__photo img {
+  transform: scale(1.06);
+}
+ 
+/* Empty silhouette placeholder */
+.cast-card__photo--empty {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  color: var(--text-dim);
+}
+.cast-card__photo--empty svg {
+  width: 36px;
+  height: 36px;
+  opacity: 0.4;
+}
+ 
+/* Search icon overlay on hover */
+.cast-card__overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  color: var(--gold);
+  backdrop-filter: blur(2px);
+}
+.cast-card:hover .cast-card__overlay {
+  opacity: 1;
+}
+ 
+/* Text info */
+.cast-card__info {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 100%;
+}
+.cast-card__name {
+  font-family: var(--font-heading, "Cinzel", serif);
+  font-size: 0.52rem;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--text);
+  text-align: center;
+  line-height: 1.3;
+  /* Clamp to 2 lines */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  transition: color 0.15s ease;
+}
+.cast-card:hover .cast-card__name {
+  color: var(--gold);
+}
+.cast-card__character {
+  font-family: var(--font-body, "Playfair Display", Georgia, serif);
+  font-style: italic;
+  font-size: 0.58rem;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

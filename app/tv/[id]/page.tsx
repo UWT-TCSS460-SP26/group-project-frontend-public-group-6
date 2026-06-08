@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import { auth } from "@/auth";
 import RatingReviewSection from "@/app/components/RatingReviewSection";
+import CastSection from "@/app/components/CastSection";
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL!;
 const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
@@ -144,6 +145,9 @@ export default async function TvDetailPage({
             />
           </div>
         </div>
+
+        {/* ── Cast strip — full width below the detail grid ── */}
+        <CastSection mediaType="tv" mediaId={Number(id)} />
       </div>
     </div>
   );

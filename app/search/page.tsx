@@ -28,8 +28,6 @@ export default async function SearchPage({
   const { q = "", type = "media", media_type } = await searchParams;
   const query = q.trim();
   const searchType = type === "people" ? "people" : "media";
-  const peopleMediaFilter =
-    mediaFilter === "movie" ? "movie" : mediaFilter === "tv" ? "tv" : "all";
 
   // Validate the people filter
   const peopleFilter: "all" | "movie" | "tv" =
@@ -122,7 +120,11 @@ export default async function SearchPage({
         <h1 className="section-title">Search</h1>
         <p className="section-subtitle">
           {searchType === "people"
-            ? peopleSubtitle
+            ? peopleFilter === "movie"
+              ? "Find movies by cast member name."
+              : peopleFilter === "tv"
+                ? "Find TV shows by cast member name."
+                : "Find movies and TV shows by cast member name."
             : "Find movies and TV shows by title."}
         </p>
         <SearchForm

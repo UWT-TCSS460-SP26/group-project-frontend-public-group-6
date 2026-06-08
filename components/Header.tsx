@@ -1,6 +1,7 @@
 import Link from "next/link";
 import NavLink from "@/components/NavLink";
 import SignInButton from "@/components/SignInButton";
+import MobileNav from "@/components/MobileNav";
 import { auth, signOut } from "@/auth";
 
 const NAV_DISCOVER = [

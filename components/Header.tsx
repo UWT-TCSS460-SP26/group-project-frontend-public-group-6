@@ -1,5 +1,6 @@
 import Link from "next/link";
 import NavLink from "@/components/NavLink";
+import MobileNav from "@/components/MobileNav";
 import { auth, signIn, signOut } from "@/auth";
 
 const NAV_DISCOVER = [
@@ -483,18 +484,20 @@ export default async function Header() {
           />
         ))}
 
-        <span className="nav-section-label">Genres</span>
-        {NAV_GENRES.map((item) => (
-          <NavLink
-            key={item.href}
-            href={item.href}
-            label={item.label}
-            icon={<NavIcon name={item.icon} />}
-          />
-        ))}
+        <div className="nav-section nav-section--secondary">
+          <span className="nav-section-label">Genres</span>
+          {NAV_GENRES.map((item) => (
+            <NavLink
+              key={item.href}
+              href={item.href}
+              label={item.label}
+              icon={<NavIcon name={item.icon} />}
+            />
+          ))}
+        </div>
 
         {session?.user && (
-          <>
+          <div className="nav-section nav-section--secondary">
             <span className="nav-section-label">My Palace</span>
             {NAV_MY_PALACE.map((item) => (
               <NavLink
@@ -504,7 +507,7 @@ export default async function Header() {
                 icon={<NavIcon name={item.icon} />}
               />
             ))}
-          </>
+          </div>
         )}
       </nav>
 
@@ -546,6 +549,12 @@ export default async function Header() {
           </form>
         )}
       </div>
+
+      <MobileNav
+        discover={NAV_DISCOVER.map(({ label, href }) => ({ label, href }))}
+        genres={NAV_GENRES.map(({ label, href }) => ({ label, href }))}
+        myPalace={session?.user ? NAV_MY_PALACE.map(({ label, href }) => ({ label, href })) : []}
+      />
 
       <div className="sidebar-ornament" aria-hidden="true" />
     </header>
